@@ -13,7 +13,7 @@ module Statistics
 
   # TODO : Implement CDF methods
   class Binomial < DiscreteDistribution
-    def initialize(@p : Float64, @n : UInt64)
+    def initialize(@p : Float64, @n : UInt32)
     end
 
     # This function returns a random integer from the binomial distribution,
@@ -22,8 +22,8 @@ module Statistics
     # ```
     # Binomial.sample(0.5, 1) # => 1
     # ```
-    def self.sample(p : Float64, n : UInt64) : UInt64
-      return LibGSL.gsl_ran_binomial(GSL::RNG, p, n)
+    def self.sample(p : Float64, n : UInt32) : UInt32
+      return LibGSL.ran_binomial(GSL::RNG, p, n)
     end
 
     # This function returns *number* random integers from the binomial distribution,
@@ -32,7 +32,7 @@ module Statistics
     # ```
     # Binomial.sample(3, 0.5, 1) # => [1, 1, 0]
     # ```
-    def self.sample(number : Int, p : Float64, n : UInt64) : Array(UInt64)
+    def self.sample(number : Int, p : Float64, n : UInt32) : Array(UInt32)
       (0...number).map { |x| Binomial.sample(p, n) }
     end
 
@@ -72,7 +72,7 @@ module Statistics
     # chi = ChiSquare.sample 5.0
     # ```
     def self.sample(nu : Float64) : Float64
-      return LibGSL.gsl_ran_chisq(GSL::RNG, nu)
+      return LibGSL.ran_chisq(GSL::RNG, nu)
     end
 
     # Returns *n* samples from the Chi square with the provided degrees of freedom *nu*
@@ -90,7 +90,7 @@ module Statistics
     # p = ChiSquare.pdf 0.4, 5
     # ```
     def self.pdf(x : Float64, nu : Float64) : Float64
-      return LibGSL.gsl_ran_chisq_pdf(x, nu)
+      return LibGSL.ran_chisq_pdf(x, nu)
     end
   end
 
@@ -139,11 +139,11 @@ module Statistics
 
   class Exponential
     def self.sample(mu : Float64) : Float64
-      return LibGSL.gsl_ran_exponential(GSL::RNG, mu)
+      return LibGSL.ran_exponential(GSL::RNG, mu)
     end
 
     def self.sample(x : Float64, mu : Float64) : Float64
-      return LibGSL.gsl_ran_exponential_pdf(x, mu)
+      return LibGSL.ran_exponential_pdf(x, mu)
     end
   end
 
@@ -156,7 +156,7 @@ module Statistics
     end
 
     def self.pdf(x : Float64, mean : Float64, std : Float64) : Float64
-      return LibGSL.gsl_ran_gaussian_pdf(x - mean, std)
+      return LibGSL.ran_gaussian_pdf(x - mean, std)
     end
 
     def sample : Float64
@@ -176,7 +176,7 @@ module Statistics
     end
 
     def self.nextGaussian(mean : Float64, std : Float64) : Float64
-      return LibGSL.gsl_ran_gaussian(GSL::RNG, std) + mean
+      return LibGSL.ran_gaussian(GSL::RNG, std) + mean
     end
 
     def nextGaussian : Float64
@@ -192,16 +192,16 @@ module Statistics
       return Poisson.sample(@mu)
     end
 
-    def self.sample(mu : Float64) : UInt64
-      return LibGSL.gsl_ran_poisson(GSL::RNG, mu)
+    def self.sample(mu : Float64) : UInt32
+      return LibGSL.ran_poisson(GSL::RNG, mu)
     end
 
-    def self.sample(n : Int, mu : Float64) : Array(UInt64)
+    def self.sample(n : Int, mu : Float64) : Array(UInt32)
       return (0..n).map { |x| self.sample(mu) }
     end
 
-    def self.pdf(k : UInt64, mu : Float64) : Float64
-      return LibGSL.gsl_ran_poisson_pdf(k, mu)
+    def self.pdf(k : UInt32, mu : Float64) : Float64
+      return LibGSL.ran_poisson_pdf(k, mu)
     end
   end
 
@@ -242,17 +242,17 @@ module Statistics
       n = mean.size
       result = Vector.new n
 
-      LibGSL.gsl_linalg_cholesky_decomp(work.pointer)
+      LibGSL.linalg_cholesky_decomp(work.pointer)
 
       (0...n).each do |k|
         result[k] = Normal.sample(0.0, 1.0)
       end
 
-      LibGSL.gsl_blas_dtrmv(LibGSL::CBLAS_UPLO_t::CblasLower, LibGSL::CBLAS_TRANSPOSE_t::CblasNoTrans, LibGSL::CBLAS_DIAG_t::CblasNonUnit, work.pointer, result.pointer)
+      LibGSL.blas_dtrmv(LibGSL::CBLAS_UPLO_t::CblasLower, LibGSL::CblasTransposeT::CblasNoTrans, LibGSL::CBLAS_DIAG_t::CblasNonUnit, work.pointer, result.pointer)
 
-      LibGSL.gsl_vector_add(result.pointer, mean.pointer)
+      LibGSL.vector_add(result.pointer, mean.pointer)
 
-      LibGSL.gsl_matrix_free(work.pointer)
+      LibGSL.matrix_free(work.pointer)
 
       return result
     end
@@ -267,7 +267,7 @@ module Statistics
     end
 
     def self.pdf(x : Float64, shape : Float64, scale : Float64) : Float64
-      return LibGSL.gsl_ran_gamma_pdf(x, shape, scale)
+      return LibGSL.ran_gamma_pdf(x, shape, scale)
     end
 
     def sample : Float64
@@ -288,7 +288,7 @@ module Statistics
 
     def self.next(shape : Float64, scale : Float64) : Float64
       rate = 1.0 / scale
-      return LibGSL.gsl_ran_gamma(GSL::RNG, shape, rate)
+      return LibGSL.ran_gamma(GSL::RNG, shape, rate)
     end
 
     def next : Float64
@@ -323,7 +323,7 @@ module Statistics
     # u.sample # => 0.0124
     # ```
     def sample : Float64
-      return LibGSL.gsl_ran_flat(GSL::RNG, @a, @b)
+      return LibGSL.ran_flat(GSL::RNG, @a, @b)
     end
 
     # Returns a sample from x ~ U(a,b).
@@ -332,7 +332,7 @@ module Statistics
     # Uniform.sample(0.0, 1.0) # => 0.0124
     # ```
     def self.sample(a : Float64, b : Float64)
-      return LibGSL.gsl_ran_flat(GSL::RNG, a, b)
+      return LibGSL.ran_flat(GSL::RNG, a, b)
     end
 
     # Returns samples from X ~ U(a,b).
@@ -341,11 +341,11 @@ module Statistics
     # Uniform.sample(5, 0.0, 1.0) # => [0.0124, 0.2145, 0.9303, 0.8617, 0.4556]
     # ```
     def self.sample(n : Int, a : Float64, b : Float64)
-      return (0...n).map { |i| LibGSL.gsl_ran_flat(GSL::RNG, a, b) }
+      return (0...n).map { |i| LibGSL.ran_flat(GSL::RNG, a, b) }
     end
 
     def self.pdf(x : Float64, a : Float64, b : Float64) : Float64
-      return LibGSL.gsl_ran_flat_pdf(x, a, b)
+      return LibGSL.ran_flat_pdf(x, a, b)
     end
   end
 
@@ -363,7 +363,7 @@ module Statistics
     cov01 = 0.0
     cov11 = 0.0
     sumsq = 0.0
-    LibGSL.gsl_fit_linear(x, 1, y, 1, x.size, pointerof(intercept),
+    LibGSL.fit_linear(x, 1, y, 1, x.size, pointerof(intercept),
       pointerof(x_est), pointerof(cov00), pointerof(cov01), pointerof(cov11), pointerof(sumsq))
     return LinearRegression.new intercept, x_est
   end
