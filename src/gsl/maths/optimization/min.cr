@@ -68,10 +68,8 @@ module GSL::Min
       f_lower = f.call(x_lower)
       f_upper = f.call(x_upper)
       f_min = f_lower
-      pp "before", x_min, f_min, x_lower, f_lower, x_upper, f_upper
       # LibGSL.min_find_bracket(pointerof(@wrap), pointerof(x_min), pointerof(f_min), pointerof(x_lower), pointerof(f_lower), pointerof(x_upper), pointerof(f_upper), max_iter/2)
       result = GSL::Min.min_find_bracket(f, pointerof(x_min), pointerof(f_min), pointerof(x_lower), pointerof(f_lower), pointerof(x_upper), pointerof(f_upper), max_iter/2)
-      pp "after", result, x_min, f_min, x_lower, f_lower, x_upper, f_upper
       LibGSL.min_fminimizer_set_with_values(@raw, pointerof(@wrap),
         x_min, f_min, x_lower, f_lower, x_upper, f_upper)
     end
@@ -87,6 +85,16 @@ module GSL::Min
 
     delegate x_lower, x_upper, x_minimum, f_lower, f_upper, f_minimum, to: @raw.value
 
+    def to_s(io)
+      io << "x: [" << x_lower << " -- " << x_minimum << " -- " << x_upper << "]\n"
+      io << "f: [" << f_lower << " -- " << f_minimum << " -- " << f_upper << "]\n"
+    end
+
+    def inspect(io)
+      io << "GSL::FMinimizer "
+      to_s(io)
+    end
+
     def iterate
       LibGSL.min_fminimizer_iterate(@raw)
     end
@@ -100,8 +108,8 @@ module GSL::Min
   # algorithm - minimization algorithm to be used
   # returns nil if number of iterations = max_iter is exceeded
   # returns {x_min, f_min} tuple if precision = eps achieved
-  def self.find_min?(x_lower, x_upper, eps : Float64, *,
-                     algorithm : GSL::Min::Type = GSL::Min::Type::QuadGolden,
+  def self.find_min?(x_lower, x_upper, eps, *,
+                     algorithm : GSL::Min::Type = GSL::Min::Type::Brent,
                      max_iter = 1000, guess = nil, &f : GSL::Function)
     FMinimizer.use(algorithm) do |minimizer|
       if guess
@@ -109,12 +117,14 @@ module GSL::Min
       else
         minimizer.find_bracket(x_lower.to_f, x_upper.to_f, max_iter, &f)
       end
+      eps = eps.to_f
       max_iter.times do
         minimizer.iterate
-        if minimizer.test_interval(eps.to_f) == LibGSL::Code::GSL_SUCCESS
+        if minimizer.test_interval(eps) == LibGSL::Code::GSL_SUCCESS
           return {minimizer.x_minimum, minimizer.f_minimum}
         end
       end
+      pp minimizer, minimizer.x_upper - minimizer.x_lower
       return nil
     end
   end
@@ -123,9 +133,9 @@ module GSL::Min
   # algorithm - minimization algorithm to be used
   # raises IterationsLimitExceeded if number of iterations = max_iter is exceeded
   # returns {x_min, f_min} tuple if precision = eps achieved
-  def self.find_min(x_lower, x_upper, eps : Float64,
+  def self.find_min(x_lower, x_upper, eps,
                     algorithm : GSL::Min::Type = GSL::Min::Type::QuadGolden,
                     max_iter = 1000, guess = nil, &f : GSL::Function)
-    find_min?(x_lower, x_upper, eps, algorithm: algorithm, max_iter: max_iter, guess: guess, &f) || raise IterationsLimitExceeded.new
+    find_min?(x_lower, x_upper, eps, algorithm: algorithm, max_iter: max_iter, guess: guess, &f) || raise IterationsLimitExceeded.new("find_min didn't converge")
   end
 end
