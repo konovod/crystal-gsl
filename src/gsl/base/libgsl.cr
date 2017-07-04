@@ -2712,7 +2712,7 @@ lib LibGSL
   fun max = gsl_max(a : LibC::Double, b : LibC::Double) : LibC::Double
   fun min = gsl_min(a : LibC::Double, b : LibC::Double) : LibC::Double
 
-  struct FunctionStruct
+  struct Function
     function : (LibC::Double, Void* -> LibC::Double)
     params : Void*
   end
@@ -2858,7 +2858,6 @@ lib LibGSL
   type ChebSeries = ChebSeriesStruct
   fun cheb_free = gsl_cheb_free(cs : ChebSeries*)
   fun cheb_init = gsl_cheb_init(cs : ChebSeries*, func : Function*, a : LibC::Double, b : LibC::Double) : LibC::Int
-  type Function = FunctionStruct
   fun cheb_order = gsl_cheb_order(cs : ChebSeries*) : LibC::SizeT
   fun cheb_size = gsl_cheb_size(cs : ChebSeries*) : LibC::SizeT
   fun cheb_coeffs = gsl_cheb_coeffs(cs : ChebSeries*) : LibC::Double*
@@ -3943,7 +3942,7 @@ lib LibGSL
   fun min_test_interval = gsl_min_test_interval(x_lower : LibC::Double, x_upper : LibC::Double, epsabs : LibC::Double, epsrel : LibC::Double) : LibC::Int
   fun min_find_bracket = gsl_min_find_bracket(f : Function*, x_minimum : LibC::Double*, f_minimum : LibC::Double*, x_lower : LibC::Double*, f_lower : LibC::Double*, x_upper : LibC::Double*, f_upper : LibC::Double*, eval_max : LibC::SizeT) : LibC::Int
 
-  struct MonteFunctionStruct
+  struct MonteFunction
     f : (LibC::Double*, LibC::SizeT, Void* -> LibC::Double)
     dim : LibC::SizeT
     params : Void*
@@ -3985,7 +3984,6 @@ lib LibGSL
   fun rng_uniform_pos = gsl_rng_uniform_pos(r : Rng*) : LibC::Double
   fun rng_uniform_int = gsl_rng_uniform_int(r : Rng*, n : LibC::ULong) : LibC::ULong
   fun monte_plain_integrate = gsl_monte_plain_integrate(f : MonteFunction*, xl : LibC::Double*, xu : LibC::Double*, dim : LibC::SizeT, calls : LibC::SizeT, r : Rng*, state : MontePlainState*, result : LibC::Double*, abserr : LibC::Double*) : LibC::Int
-  type MonteFunction = MonteFunctionStruct
 
   struct MontePlainState
     dim : LibC::SizeT
@@ -4301,7 +4299,7 @@ lib LibGSL
   fun multifit_covar = gsl_multifit_covar(j : Matrix*, epsrel : LibC::Double, covar : Matrix*) : LibC::Int
   fun multifit_covar_qrpt = gsl_multifit_covar_QRPT(r : Matrix*, perm : Permutation*, epsrel : LibC::Double, covar : Matrix*) : LibC::Int
 
-  struct MultifitFunctionStruct
+  struct MultifitFunction
     f : (Vector*, Void*, Vector* -> LibC::Int)
     n : LibC::SizeT
     p : LibC::SizeT
@@ -4318,8 +4316,6 @@ lib LibGSL
     iterate : (Void*, MultifitFunction*, Vector*, Vector*, Vector* -> LibC::Int)
     free : (Void* -> Void)
   end
-
-  type MultifitFunction = MultifitFunctionStruct
 
   struct MultifitFsolver
     type : MultifitFsolverType*
@@ -4565,7 +4561,7 @@ lib LibGSL
   fun multilarge_nlinear_df = gsl_multilarge_nlinear_df(h : LibC::Double, fdtype : MultilargeNlinearFdtype, x : Vector*, wts : Vector*, fdf : MultilargeNlinearFdf*, f : Vector*, j : Matrix*, work : Vector*) : LibC::Int
   fun multilarge_nlinear_fdfvv = gsl_multilarge_nlinear_fdfvv(h : LibC::Double, x : Vector*, v : Vector*, f : Vector*, j : Matrix*, swts : Vector*, fdf : MultilargeNlinearFdf*, fvv : Vector*, work : Vector*) : LibC::Int
 
-  struct MultiminFunctionStruct
+  struct MultiminFunction
     f : (Vector*, Void* -> LibC::Double)
     n : LibC::SizeT
     params : Void*
@@ -4580,7 +4576,6 @@ lib LibGSL
   end
 
   fun multimin_diff = gsl_multimin_diff(f : MultiminFunction*, x : Vector*, g : Vector*) : LibC::Int
-  type MultiminFunction = MultiminFunctionStruct
   fun multimin_fminimizer_alloc = gsl_multimin_fminimizer_alloc(t : MultiminFminimizerType*, n : LibC::SizeT) : MultiminFminimizer*
 
   struct MultiminFminimizerType
@@ -4644,14 +4639,13 @@ lib LibGSL
   fun multimin_fdfminimizer_gradient = gsl_multimin_fdfminimizer_gradient(s : MultiminFdfminimizer*) : Vector*
   fun multimin_fdfminimizer_minimum = gsl_multimin_fdfminimizer_minimum(s : MultiminFdfminimizer*) : LibC::Double
 
-  struct MultirootFunctionStruct
+  struct MultirootFunction
     f : (Vector*, Void*, Vector* -> LibC::Int)
     n : LibC::SizeT
     params : Void*
   end
 
   fun multiroot_fdjacobian = gsl_multiroot_fdjacobian(f : MultirootFunction*, x : Vector*, f : Vector*, epsrel : LibC::Double, jacobian : Matrix*) : LibC::Int
-  type MultirootFunction = MultirootFunctionStruct
   fun multiroot_fsolver_alloc = gsl_multiroot_fsolver_alloc(t : MultirootFsolverType*, n : LibC::SizeT) : MultirootFsolver*
 
   struct MultirootFsolverType

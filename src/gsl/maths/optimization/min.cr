@@ -1,4 +1,4 @@
-require "../../base/libgsl.cr"
+require "../../base/*"
 
 module GSL::Min
   enum Type
@@ -8,7 +8,7 @@ module GSL::Min
   end
 
   class FMinimizer
-    @raw : LibGSL::MinFminimizer*
+    getter raw : LibGSL::MinFminimizer*
 
     def initialize(typ : Type)
       case typ
@@ -33,6 +33,41 @@ module GSL::Min
 
     def finalize
       free
+    end
+
+    # fun min_fminimizer_set = gsl_min_fminimizer_set(s : MinFminimizer*, f : Function*, x_minimum : LibC::Double, x_lower : LibC::Double, x_upper : LibC::Double) : LibC::Int
+    # fun min_fminimizer_set_with_values = gsl_min_fminimizer_set_with_values(s : MinFminimizer*, f : Function*, x_minimum : LibC::Double, f_minimum : LibC::Double, x_lower : LibC::Double, f_lower : LibC::Double, x_upper : LibC::Double, f_upper : LibC::Double) : LibC::Int
+    # fun min_fminimizer_iterate = gsl_min_fminimizer_iterate(s : MinFminimizer*) : LibC::Int
+    # fun min_test_interval = gsl_min_test_interval(x_lower : LibC::Double, x_upper : LibC::Double, epsabs : LibC::Double, epsrel : LibC::Double) : LibC::Int
+    # fun min_find_bracket = gsl_min_find_bracket(f : Function*, x_minimum : LibC::Double*, f_minimum : LibC::Double*, x_lower : LibC::Double*, f_lower : LibC::Double*, x_upper : LibC::Double*, f_upper : LibC::Double*, eval_max : LibC::SizeT) : LibC::Int
+
+    def name
+      String.new(LibGSL.min_fminimizer_name(@raw))
+    end
+
+    getter function : GSL::Function?
+    @wrap = LibGSL::Function.new
+
+    def setup(x_minimum : Float64, x_lower : Float64, x_upper : Float64, &f : GSL::Function)
+      @function = f
+      @wrap = GSL.wrap_function(self) do |x, data|
+        data.as(FMinimizer).function.not_nil!.call(x)
+      end
+      LibGSL.min_fminimizer_set(@raw, pointerof(@wrap),
+        x_minimum, x_lower, x_upper)
+    end
+
+    #
+    # def setup(x_minimum : Float64, f_minimum : Float64, x_lower : Float64, f_lower : Float64, x_upper : Float64, f_upper : Float64, &f : GSL::Function)
+    #   @function = f
+    #   LibGSL.min_fminimizer_set_with_values(@raw, LibGSL::FunctionStruct.new(
+    #     ->(x : Float64, data : Void*) do
+    #       0.0
+    #     end, self), x_minimum, f_minimum, x_lower, f_lower, x_upper, f_upper)
+    # end
+
+    def iterate
+      LibGSL.min_fminimizer_iterate(@raw)
     end
   end
 end
