@@ -1,4 +1,5 @@
 require "../../base/*"
+require "./find_bracket"
 
 module GSL::Min
   enum Type
@@ -68,7 +69,8 @@ module GSL::Min
       f_upper = f.call(x_upper)
       f_min = f_lower
       pp "before", x_min, f_min, x_lower, f_lower, x_upper, f_upper
-      result = LibGSL.min_find_bracket(pointerof(@wrap), pointerof(x_min), pointerof(f_min), pointerof(x_lower), pointerof(f_lower), pointerof(x_upper), pointerof(f_upper), max_iter/2)
+      # LibGSL.min_find_bracket(pointerof(@wrap), pointerof(x_min), pointerof(f_min), pointerof(x_lower), pointerof(f_lower), pointerof(x_upper), pointerof(f_upper), max_iter/2)
+      result = GSL::Min.min_find_bracket(f, pointerof(x_min), pointerof(f_min), pointerof(x_lower), pointerof(f_lower), pointerof(x_upper), pointerof(f_upper), max_iter/2)
       pp "after", result, x_min, f_min, x_lower, f_lower, x_upper, f_upper
       LibGSL.min_fminimizer_set_with_values(@raw, pointerof(@wrap),
         x_min, f_min, x_lower, f_lower, x_upper, f_upper)
