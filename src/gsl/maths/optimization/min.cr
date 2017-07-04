@@ -35,11 +35,12 @@ module GSL::Min
       free
     end
 
-    # fun min_fminimizer_set = gsl_min_fminimizer_set(s : MinFminimizer*, f : Function*, x_minimum : LibC::Double, x_lower : LibC::Double, x_upper : LibC::Double) : LibC::Int
-    # fun min_fminimizer_set_with_values = gsl_min_fminimizer_set_with_values(s : MinFminimizer*, f : Function*, x_minimum : LibC::Double, f_minimum : LibC::Double, x_lower : LibC::Double, f_lower : LibC::Double, x_upper : LibC::Double, f_upper : LibC::Double) : LibC::Int
-    # fun min_fminimizer_iterate = gsl_min_fminimizer_iterate(s : MinFminimizer*) : LibC::Int
-    # fun min_test_interval = gsl_min_test_interval(x_lower : LibC::Double, x_upper : LibC::Double, epsabs : LibC::Double, epsrel : LibC::Double) : LibC::Int
-    # fun min_find_bracket = gsl_min_find_bracket(f : Function*, x_minimum : LibC::Double*, f_minimum : LibC::Double*, x_lower : LibC::Double*, f_lower : LibC::Double*, x_upper : LibC::Double*, f_upper : LibC::Double*, eval_max : LibC::SizeT) : LibC::Int
+    def self.use(typ : Type)
+      min = self.new(typ)
+      result = yield(min)
+      min.free
+      result
+    end
 
     def name
       String.new(LibGSL.min_fminimizer_name(@raw))
@@ -57,12 +58,28 @@ module GSL::Min
         x_minimum, x_lower, x_upper)
     end
 
+    def find_bracket(x_lower : Float64, x_upper : Float64, max_iter = 1000, &f : GSL::Function)
+      @function = f
+      @wrap = GSL.wrap_function(self) do |x, data|
+        data.as(FMinimizer).function.not_nil!.call(x)
+      end
+      x_min = x_lower
+      f_lower = f.call(x_lower)
+      f_upper = f.call(x_upper)
+      f_min = f_lower
+      pp "before", x_min, f_min, x_lower, f_lower, x_upper, f_upper
+      result = LibGSL.min_find_bracket(pointerof(@wrap), pointerof(x_min), pointerof(f_min), pointerof(x_lower), pointerof(f_lower), pointerof(x_upper), pointerof(f_upper), max_iter/2)
+      pp "after", result, x_min, f_min, x_lower, f_lower, x_upper, f_upper
+      LibGSL.min_fminimizer_set_with_values(@raw, pointerof(@wrap),
+        x_min, f_min, x_lower, f_lower, x_upper, f_upper)
+    end
+
     def setup(x_minimum : Float64, f_minimum : Float64, x_lower : Float64, f_lower : Float64, x_upper : Float64, f_upper : Float64, &f : GSL::Function)
       @function = f
       @wrap = GSL.wrap_function(self) do |x, data|
         data.as(FMinimizer).function.not_nil!.call(x)
       end
-      LibGSL.min_fminimizer_set(@raw, pointerof(@wrap),
+      LibGSL.min_fminimizer_set_with_values(@raw, pointerof(@wrap),
         x_minimum, f_minimum, x_lower, f_lower, x_upper, f_upper)
     end
 
@@ -75,5 +92,38 @@ module GSL::Min
     def test_interval(eps_abs, eps_rel = 0.0)
       LibGSL::Code.new(LibGSL.min_test_interval(x_lower, x_upper, eps_abs, eps_rel))
     end
+  end
+
+  # High-level interface to minimizer. Finds minimum of function f between x_lower and x_upper.
+  # algorithm - minimization algorithm to be used
+  # returns nil if number of iterations = max_iter is exceeded
+  # returns {x_min, f_min} tuple if precision = eps achieved
+  def self.find_min?(x_lower, x_upper, eps : Float64, *,
+                     algorithm : GSL::Min::Type = GSL::Min::Type::QuadGolden,
+                     max_iter = 1000, guess = nil, &f : GSL::Function)
+    FMinimizer.use(algorithm) do |minimizer|
+      if guess
+        minimizer.setup(guess.to_f, x_lower.to_f, x_upper.to_f, &f)
+      else
+        minimizer.find_bracket(x_lower.to_f, x_upper.to_f, max_iter, &f)
+      end
+      max_iter.times do
+        minimizer.iterate
+        if minimizer.test_interval(eps.to_f) == LibGSL::Code::GSL_SUCCESS
+          return {minimizer.x_minimum, minimizer.f_minimum}
+        end
+      end
+      return nil
+    end
+  end
+
+  # High-level interface to minimizer. Finds minimum of function f between x_lower and x_upper.
+  # algorithm - minimization algorithm to be used
+  # raises IterationsLimitExceeded if number of iterations = max_iter is exceeded
+  # returns {x_min, f_min} tuple if precision = eps achieved
+  def self.find_min(x_lower, x_upper, eps : Float64,
+                    algorithm : GSL::Min::Type = GSL::Min::Type::QuadGolden,
+                    max_iter = 1000, guess = nil, &f : GSL::Function)
+    find_min?(x_lower, x_upper, eps, algorithm: algorithm, max_iter: max_iter, guess: guess, &f) || raise IterationsLimitExceeded.new
   end
 end

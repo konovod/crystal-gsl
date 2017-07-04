@@ -23,5 +23,26 @@ describe GSL do
       fmin.test_interval(eps).should eq LibGSL::Code::GSL_SUCCESS
       fmin.x_minimum.should be_close Math::PI, eps
     end
+
+    it "performs minimization using high-level interface" do
+      xm, fm = GSL::Min.find_min(0, 6, 1e-6) do |x|
+        Math.cos(x)
+      end
+      xm.should be_close Math::PI, 1e-6
+    end
+
+    it "use guess parameter to avoid bracketing search" do
+      xm, fm = GSL::Min.find_min(-2, 10, 1e-6, guess: -0.5) do |x|
+        x*x
+      end
+      xm.should be_close 0.0, 1e-6
+    end
+
+    it "finds correct minimum even when middle of interval isn't lower than bounds" do
+      xm, fm = GSL::Min.find_min(-2, 10, 1e-6) do |x|
+        x*x
+      end
+      xm.should be_close 0.0, 1e-6
+    end
   end
 end
