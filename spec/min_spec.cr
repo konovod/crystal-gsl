@@ -20,10 +20,8 @@ describe GSL do
         Math.cos(x) + 1.0
       end
       6.times { fmin.iterate }
-      a = fmin.raw.value.x_lower
-      b = fmin.raw.value.x_upper
-      LibGSL.min_test_interval(a, b, eps, 0.0).should eq LibGSL::Code::GSL_SUCCESS.to_i
-      a.should be_close Math::PI, eps
+      fmin.test_interval(eps).should eq LibGSL::Code::GSL_SUCCESS
+      fmin.x_minimum.should be_close Math::PI, eps
     end
   end
 end

@@ -57,17 +57,23 @@ module GSL::Min
         x_minimum, x_lower, x_upper)
     end
 
-    #
-    # def setup(x_minimum : Float64, f_minimum : Float64, x_lower : Float64, f_lower : Float64, x_upper : Float64, f_upper : Float64, &f : GSL::Function)
-    #   @function = f
-    #   LibGSL.min_fminimizer_set_with_values(@raw, LibGSL::FunctionStruct.new(
-    #     ->(x : Float64, data : Void*) do
-    #       0.0
-    #     end, self), x_minimum, f_minimum, x_lower, f_lower, x_upper, f_upper)
-    # end
+    def setup(x_minimum : Float64, f_minimum : Float64, x_lower : Float64, f_lower : Float64, x_upper : Float64, f_upper : Float64, &f : GSL::Function)
+      @function = f
+      @wrap = GSL.wrap_function(self) do |x, data|
+        data.as(FMinimizer).function.not_nil!.call(x)
+      end
+      LibGSL.min_fminimizer_set(@raw, pointerof(@wrap),
+        x_minimum, f_minimum, x_lower, f_lower, x_upper, f_upper)
+    end
+
+    delegate x_lower, x_upper, x_minimum, f_lower, f_upper, f_minimum, to: @raw.value
 
     def iterate
       LibGSL.min_fminimizer_iterate(@raw)
+    end
+
+    def test_interval(eps_abs, eps_rel = 0.0)
+      LibGSL::Code.new(LibGSL.min_test_interval(x_lower, x_upper, eps_abs, eps_rel))
     end
   end
 end
