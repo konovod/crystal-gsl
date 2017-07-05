@@ -1,5 +1,7 @@
 # this is a Crystal translation of gsl/min/bracketing.c
 # with patch proposed in http://savannah.gnu.org/bugs/?45053
+
+# TODO - move somewhere?
 private GOLDEN               =              0.3819660
 private GSL_SQRT_DBL_EPSILON = 1.4901161193847656e-08
 

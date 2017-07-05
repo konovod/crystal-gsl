@@ -11,16 +11,16 @@ describe GSL do
     it "performs minimization using low-level interface" do
       # example from https://www.gnu.org/software/gsl/doc/html/min.html
       fmin = GSL::Min::FMinimizer.new(GSL::Min::Type::Brent)
-      max_iter = 100
       m = 2.0
       a = 0.0
       b = 6.0
-      eps = 0.001
+      eps = 1e-6
       fmin.setup(m, a, b) do |x|
         Math.cos(x) + 1.0
       end
-      6.times { fmin.iterate }
+      16.times { fmin.iterate }
       fmin.test_interval(eps).should eq LibGSL::Code::GSL_SUCCESS
+
       fmin.x_minimum.should be_close Math::PI, eps
     end
 
@@ -43,6 +43,13 @@ describe GSL do
         x**4
       end
       xm.should be_close 0.0, 1e-6
+    end
+
+    it "have enough precision with guess from example" do
+      xm, fm = GSL::Min.find_min(0, 6, 1e-6, guess: 2) do |x|
+        Math.cos(x)
+      end
+      xm.should be_close Math::PI, 1e-6
     end
   end
 end

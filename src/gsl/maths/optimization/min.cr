@@ -1,6 +1,8 @@
 require "../../base/*"
 require "./find_bracket"
 
+private GSL_SQRT_DBL_EPSILON = 1.4901161193847656e-08
+
 module GSL::Min
   enum Type
     GoldenSection
@@ -124,8 +126,11 @@ module GSL::Min
           return {minimizer.x_minimum, minimizer.f_minimum}
         end
       end
-      pp minimizer, minimizer.x_upper - minimizer.x_lower
-      return nil
+      if minimizer.f_upper - minimizer.f_minimum < GSL_SQRT_DBL_EPSILON
+        return {minimizer.x_minimum, minimizer.f_minimum}
+      else
+        return nil
+      end
     end
   end
 
@@ -134,7 +139,7 @@ module GSL::Min
   # raises IterationsLimitExceeded if number of iterations = max_iter is exceeded
   # returns {x_min, f_min} tuple if precision = eps achieved
   def self.find_min(x_lower, x_upper, eps,
-                    algorithm : GSL::Min::Type = GSL::Min::Type::QuadGolden,
+                    algorithm : GSL::Min::Type = GSL::Min::Type::Brent,
                     max_iter = 1000, guess = nil, &f : GSL::Function)
     find_min?(x_lower, x_upper, eps, algorithm: algorithm, max_iter: max_iter, guess: guess, &f) || raise IterationsLimitExceeded.new("find_min didn't converge")
   end
