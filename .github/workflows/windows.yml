@@ -35,7 +35,5 @@ jobs:
           msbuild gsl.lib.sln /p:Configuration=Debug /p:Platform=x64
       - name: copy GSL libraries
         run: |
-          cd gsl/lib/x64/Debug
-          copy cblas.lib D:\a\_temp\crystal-nightly-true-undefined\lib
-          copy gsl.lib D:\a\_temp\crystal-nightly-true-undefined\lib
+          echo "LIB=$(pwd)\gsl/lib/x64/Debug;${env:LIB}" >>${env:GITHUB_ENV}          
       - run: crystal spec
