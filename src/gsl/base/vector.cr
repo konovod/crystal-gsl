@@ -1,7 +1,8 @@
 module GSL
   struct Vector
     getter raw : LibGSL::Gsl_vector
-    @block : LibGSL::Gsl_block
+
+    # @block : LibGSL::Gsl_block
 
     def size : Int32
       @raw.size.to_i32
@@ -9,12 +10,12 @@ module GSL
 
     def initialize(size : Int32)
       slice = Slice(Float64).new(size)
-      @block = LibGSL::Gsl_block.new(size: size, data: slice.to_unsafe)
+      # @block = LibGSL::Gsl_block.new(size: size, data: slice.to_unsafe)
       @raw = LibGSL::Gsl_vector.new(
         size: size,
         stride: 1,
         data: slice.to_unsafe,
-        block: pointerof(@block),
+        block: nil,
         owner: 0)
     end
 
