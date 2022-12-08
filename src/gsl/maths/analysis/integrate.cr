@@ -152,7 +152,7 @@ module GSL::Integration
     QAG_GAUSS61
     QAGS
     CQUAD
-    # ROMBERG
+    ROMBERG
   end
 
   def self.integrate(function : Proc(Float64, Float64), a : Float64, b : Float64, *, epsabs : Float64 = 0.0, epsrel : Float64 = 0.0, limit = 1000, algorithm : Algorithm = Algorithm::CQUAD)
@@ -176,8 +176,8 @@ module GSL::Integration
       return qags(function, a, b, epsabs: epsabs, epsrel: epsrel, limit: limit)[0]
     in .cquad?
       return cquad(function, a, b, epsabs: epsabs, epsrel: epsrel, limit: limit)[0]
-      # in .romberg?
-      #   return romberg(function, a, b, epsabs: epsabs, epsrel: epsrel, limit: limit)[0]
+    in .romberg?
+      return romberg(function, a, b, epsabs: epsabs, epsrel: epsrel, limit: limit)[0]
     end
   end
 

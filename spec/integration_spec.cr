@@ -90,8 +90,18 @@ describe GSL::Integration do
     end
   end
 
+  describe "romberg algorithm" do
+    it "integrates simple function" do
+      f = ->(x : Float64) { Math.sin(x) }
+      result, count = GSL::Integration.romberg(f, 0.0, Math::PI/2)
+      result.should be_close 1.0, 1e-9
+    end
+  end
+
   it "has high-level routine to integrate" do
-    r = GSL::Integration.integrate(0.0, Math::PI) { |x| Math.sin(x) }
-    r.should be_close 2.0, 1e-9
+    GSL::Integration::Algorithm.each do |algo|
+      r = GSL::Integration.integrate(0.0, Math::PI, algorithm: algo) { |x| Math.sin(x) }
+      r.should be_close 2.0, 1e-9
+    end
   end
 end
