@@ -1,9 +1,21 @@
 module GSL
   struct Vector
-    getter pointer
+    getter raw : LibGSL::Gsl_vector
+    @block : LibGSL::Gsl_block
 
-    def initialize(@size : Int32)
-      @pointer = LibGSL.gsl_vector_calloc(@size)
+    def size : Int32
+      @raw.size.to_i32
+    end
+
+    def initialize(size : Int32)
+      slice = Slice(Float64).new(size)
+      @block = LibGSL::Gsl_block.new(size: size, data: slice.to_unsafe)
+      @raw = LibGSL::Gsl_vector.new(
+        size: size,
+        stride: 1,
+        data: slice.to_unsafe,
+        block: pointerof(@block),
+        owner: 0)
     end
 
     def inspect
@@ -11,32 +23,28 @@ module GSL
     end
 
     def initialize(a : Array(Float64))
-      @size = a.size
-      @pointer = LibGSL.gsl_vector_calloc(@size)
-      (0...@size).each do |i|
-        self[i] = a[i]
-      end
+      initialize(a.size)
+      a.to_unsafe.copy_to(raw.data, a.size)
     end
 
     def ==(n : GSL::Vector) : Bool
       LibGSL.gsl_vector_equal(self.pointer, n.pointer) == 1 ? true : false
     end
 
-    def size : Int32
-      return @size
-    end
-
     def [](i) : Float64
-      return LibGSL.gsl_vector_get(@pointer, i)
+      to_slice[i]
     end
 
     def []=(i, x) : Float64
-      LibGSL.gsl_vector_set(@pointer, i, x)
-      return LibGSL.gsl_vector_get(@pointer, i)
+      to_slice[i] = x
     end
 
-    def getPointer
-      return @pointer
+    def pointer
+      pointerof(@raw)
+    end
+
+    def to_slice
+      Slice(Float64).new(@raw.data, size)
     end
 
     def to_s : String
@@ -44,11 +52,7 @@ module GSL
     end
 
     def to_array : Array(Float64)
-      result = Array(Float64).new @size { 0.0 }
-      (0...@size).each do |i|
-        result[i] = self[i]
-      end
-      return result
+      Array(Float64).new(size) { |i| self[i] }
     end
 
     # alias to to_array
