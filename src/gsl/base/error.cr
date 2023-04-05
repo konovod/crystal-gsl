@@ -1,13 +1,13 @@
-class LengthException < Exception
-end
-
-class NonIdenticalHistograms < Exception
-end
-
-class IterationsLimitExceeded < Exception
-end
-
 module GSL
+  class LengthException < ::Exception
+  end
+
+  class NonIdenticalHistograms < ::Exception
+  end
+
+  class IterationsLimitExceeded < ::Exception
+  end
+
   class Exception < ::Exception
     getter reason : String
     getter file : String
