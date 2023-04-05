@@ -1,8 +1,6 @@
 require "./spec_helper"
 
 describe GSL::Consts do
-  p GSL::Consts::SPEED_OF_LIGHT
-
   it "has speed of light (mksa)" do
     c = GSL::Consts::SPEED_OF_LIGHT
     eps = GSL::Consts::VACUUM_PERMITTIVITY
