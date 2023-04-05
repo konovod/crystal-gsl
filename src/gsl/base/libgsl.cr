@@ -3036,7 +3036,12 @@ lib LibGSL
   fun gsl_cheb_eval_n(cs : Gsl_cheb_series*, order : LibC::SizeT, x : LibC::Double) : LibC::Double
   fun gsl_cheb_eval_n_err(cs : Gsl_cheb_series*, order : LibC::SizeT, x : LibC::Double, result : LibC::Double*, abserr : LibC::Double*) : LibC::Int
   fun gsl_cheb_eval_mode(cs : Gsl_cheb_series*, x : LibC::Double, mode : Gsl_mode_t) : LibC::Double
-  alias Gsl_mode_t = LibC::UInt
+
+  enum Gsl_mode_t : LibC::UInt
+    GSL_PREC_DOUBLE = 0
+    GSL_PREC_SINGLE = 1
+    GSL_PREC_APPROX = 2
+  end
   fun gsl_cheb_eval_mode_e(cs : Gsl_cheb_series*, x : LibC::Double, mode : Gsl_mode_t, result : LibC::Double*, abserr : LibC::Double*) : LibC::Int
   fun gsl_cheb_calc_deriv(deriv : Gsl_cheb_series*, cs : Gsl_cheb_series*) : LibC::Int
   fun gsl_cheb_calc_integ(integ : Gsl_cheb_series*, cs : Gsl_cheb_series*) : LibC::Int

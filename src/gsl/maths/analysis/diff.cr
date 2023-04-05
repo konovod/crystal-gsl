@@ -12,12 +12,14 @@ module GSL
     case dir
     in .central?
       code = LibGSL.gsl_deriv_central(pointerof(f), x, step, pointerof(result), pointerof(abserr))
+      check_return_code(LibGSL::Code.new(code), "gsl_deriv_central")
     in .forward?
       code = LibGSL.gsl_deriv_forward(pointerof(f), x, step, pointerof(result), pointerof(abserr))
+      check_return_code(LibGSL::Code.new(code), "gsl_deriv_forward")
     in .backward?
       code = LibGSL.gsl_deriv_backward(pointerof(f), x, step, pointerof(result), pointerof(abserr))
+      check_return_code(LibGSL::Code.new(code), "gsl_deriv_backward")
     end
-    code = LibGSL::Code.new(code)
     return result, abserr
   end
 

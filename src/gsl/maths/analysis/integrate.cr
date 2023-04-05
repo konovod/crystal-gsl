@@ -15,7 +15,8 @@ module GSL::Integration
     if epsabs.zero? && epsrel.zero?
       epsabs = 1e-9
     end
-    code = LibGSL::Code.new(LibGSL.gsl_integration_qng(pointerof(f), a, b, epsabs, epsrel, out result, out abserr, out neval))
+    code = LibGSL.gsl_integration_qng(pointerof(f), a, b, epsabs, epsrel, out result, out abserr, out neval)
+    GSL.check_return_code(LibGSL::Code.new(code), "gsl_integration_qng")
     return result, abserr, neval
   end
 
@@ -50,7 +51,8 @@ module GSL::Integration
     if epsabs.zero? && epsrel.zero?
       epsabs = 1e-9
     end
-    code = LibGSL::Code.new(LibGSL.gsl_integration_qag(pointerof(f), a, b, epsabs, epsrel, limit, key.to_i, @@workspace, out result, out abserr))
+    code = LibGSL.gsl_integration_qag(pointerof(f), a, b, epsabs, epsrel, limit, key.to_i, @@workspace, out result, out abserr)
+    GSL.check_return_code(LibGSL::Code.new(code), "gsl_integration_qag")
     return result, abserr
   end
 
@@ -67,13 +69,17 @@ module GSL::Integration
     result = uninitialized Float64
     abserr = uninitialized Float64
     if a.finite? && b.finite?
-      code = LibGSL::Code.new(LibGSL.gsl_integration_qags(pointerof(f), a, b, epsabs, epsrel, limit, @@workspace, pointerof(result), pointerof(abserr)))
+      code = LibGSL.gsl_integration_qags(pointerof(f), a, b, epsabs, epsrel, limit, @@workspace, pointerof(result), pointerof(abserr))
+      GSL.check_return_code(LibGSL::Code.new(code), "gsl_integration_qags")
     elsif a.finite? && b > 0
-      code = LibGSL::Code.new(LibGSL.gsl_integration_qagiu(pointerof(f), a, epsabs, epsrel, limit, @@workspace, pointerof(result), pointerof(abserr)))
+      code = LibGSL.gsl_integration_qagiu(pointerof(f), a, epsabs, epsrel, limit, @@workspace, pointerof(result), pointerof(abserr))
+      GSL.check_return_code(LibGSL::Code.new(code), "gsl_integration_qagiu")
     elsif b.finite? && a < 0
-      code = LibGSL::Code.new(LibGSL.gsl_integration_qagil(pointerof(f), b, epsabs, epsrel, limit, @@workspace, pointerof(result), pointerof(abserr)))
+      code = LibGSL.gsl_integration_qagil(pointerof(f), b, epsabs, epsrel, limit, @@workspace, pointerof(result), pointerof(abserr))
+      GSL.check_return_code(LibGSL::Code.new(code), "gsl_integration_qagil")
     elsif a < 0 && b > 0
-      code = LibGSL::Code.new(LibGSL.gsl_integration_qagi(pointerof(f), epsabs, epsrel, limit, @@workspace, pointerof(result), pointerof(abserr)))
+      code = LibGSL.gsl_integration_qagi(pointerof(f), epsabs, epsrel, limit, @@workspace, pointerof(result), pointerof(abserr))
+      GSL.check_return_code(LibGSL::Code.new(code), "gsl_integration_qagi")
     else
       raise ArgumentError.new("integration incorrect bounds: #{a}, #{b}")
     end
@@ -90,7 +96,8 @@ module GSL::Integration
     if epsabs.zero? && epsrel.zero?
       epsabs = 1e-9
     end
-    code = LibGSL::Code.new(LibGSL.gsl_integration_qagp(pointerof(f), points, points.size, epsabs, epsrel, limit, @@workspace, out result, out abserr))
+    code = LibGSL.gsl_integration_qagp(pointerof(f), points, points.size, epsabs, epsrel, limit, @@workspace, out result, out abserr)
+    GSL.check_return_code(LibGSL::Code.new(code), "gsl_integration_qagp")
     return result, abserr
   end
 
@@ -104,7 +111,8 @@ module GSL::Integration
     if epsabs.zero? && epsrel.zero?
       epsabs = 1e-9
     end
-    code = LibGSL::Code.new(LibGSL.gsl_integration_qawc(pointerof(f), a, b, c, epsabs, epsrel, limit, @@workspace, out result, out abserr))
+    code = LibGSL.gsl_integration_qawc(pointerof(f), a, b, c, epsabs, epsrel, limit, @@workspace, out result, out abserr)
+    GSL.check_return_code(LibGSL::Code.new(code), "gsl_integration_qawc")
     return result, abserr
   end
 
@@ -121,7 +129,8 @@ module GSL::Integration
     if epsabs.zero? && epsrel.zero?
       epsabs = 1e-9
     end
-    code = LibGSL::Code.new(LibGSL.gsl_integration_cquad(pointerof(f), a, b, epsabs, epsrel, @@cquad_workspace, out result, out abserr, out neval))
+    code = LibGSL.gsl_integration_cquad(pointerof(f), a, b, epsabs, epsrel, @@cquad_workspace, out result, out abserr, out neval)
+    GSL.check_return_code(LibGSL::Code.new(code), "gsl_integration_cquad")
     return result, abserr, neval
   end
 
@@ -138,7 +147,8 @@ module GSL::Integration
     if epsabs.zero? && epsrel.zero?
       epsabs = 1e-9
     end
-    code = LibGSL::Code.new(LibGSL.gsl_integration_romberg(pointerof(f), a, b, epsabs, epsrel, out result, out neval, @@romberg_workspace))
+    code = LibGSL.gsl_integration_romberg(pointerof(f), a, b, epsabs, epsrel, out result, out neval, @@romberg_workspace)
+    GSL.check_return_code(LibGSL::Code.new(code), "gsl_integration_romberg")
     return result, neval
   end
 

@@ -9,6 +9,15 @@ module GSL
   end
 
   class Exception < ::Exception
+  end
+
+  protected def self.check_return_code(code : LibGSL::Code, function_name : String)
+    unless code == LibGSL::Code::GSL_SUCCESS
+      raise GSL::Exception.new("#{function_name} returned #{code}")
+    end
+  end
+
+  class InternalException < ::Exception
     getter reason : String
     getter file : String
     getter line : Int32
@@ -21,7 +30,7 @@ module GSL
 
   private def self.update_error_handler
     handler = ->(reason : LibC::Char*, file : LibC::Char*, line : LibC::Int, gsl_errno : LibC::Int) : Nil do
-      raise GSL::Exception.new(String.new(reason), String.new(file), line, LibGSL::Code.new(gsl_errno))
+      raise GSL::InternalException.new(String.new(reason), String.new(file), line, LibGSL::Code.new(gsl_errno))
     end
     LibGSL.gsl_set_error_handler(handler)
   end

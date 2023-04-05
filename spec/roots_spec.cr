@@ -36,7 +36,7 @@ describe GSL do
     end
 
     it "raises when bracketing isn't possible" do
-      expect_raises(GSL::Exception) do
+      expect_raises(GSL::InternalException) do
         GSL::Roots.find_root(0, Math::PI*2) do |x|
           Math.cos(x) - 0.5
         end
