@@ -33,11 +33,11 @@ module GSL
     end
 
     def [](i) : Float64
-      to_slice[i]
+      to_slice[i*@raw.stride]
     end
 
     def []=(i, x) : Float64
-      to_slice[i] = x
+      to_slice[i*@raw.stride] = x
     end
 
     def pointer
@@ -45,7 +45,7 @@ module GSL
     end
 
     def to_slice
-      Slice(Float64).new(@raw.data, size)
+      Slice(Float64).new(@raw.data, size*@raw.stride)
     end
 
     def to_s : String

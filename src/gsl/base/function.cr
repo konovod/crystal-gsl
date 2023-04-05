@@ -64,7 +64,7 @@ module GSL
     wrap_function(function)
   end
 
-  alias MultiRootFunction = (Tuple(Vector, Vector))
+  alias MultiRootFunction = (Vector -> Vector)
   alias MultiRootFunctionFDF = (Vector -> Tuple(Float64, DenseMatrix))
 
   # def self.wrap_function(function : MultiRootFunction)
