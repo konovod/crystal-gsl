@@ -1,5 +1,8 @@
 @[Link("cblas")]
 @[Link("gsl")]
+{% if flag? :windows %}
+  @[Link(ldflags: "/ignore:4099")]
+{% end %}
 lib LibGSL
   # GSL codes
   enum Code

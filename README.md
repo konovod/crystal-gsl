@@ -1,8 +1,8 @@
 # crystal-gsl
 
-[![Linux CI](https://github.com/ruivieira/crystal-gsl/actions/workflows/linux.yml/badge.svg)](https://github.com/ruivieira/crystal-gsl/actions/workflows/linux.yml)
-[![MacOS CI](https://github.com/ruivieira/crystal-gsl/actions/workflows/macos.yml/badge.svg)](https://github.com/ruivieira/crystal-gsl/actions/workflows/macos.yml)
-[![Windows CI](https://github.com/ruivieira/crystal-gsl/actions/workflows/windows.yml/badge.svg)](https://github.com/ruivieira/crystal-gsl/actions/workflows/windows.yml)
+[![Linux CI](https://github.com/konovod/crystal-gsl/actions/workflows/linux.yml/badge.svg)](https://github.com/konovod/crystal-gsl/actions/workflows/linux.yml)
+[![MacOS CI](https://github.com/konovod/crystal-gsl/actions/workflows/macos.yml/badge.svg)](https://github.com/konovod/crystal-gsl/actions/workflows/macos.yml)
+[![Windows CI](https://github.com/konovod/crystal-gsl/actions/workflows/windows.yml/badge.svg)](https://github.com/konovod/crystal-gsl/actions/workflows/windows.yml)
 
 GNU Scientific Library (GSL) binding for Crystal
 
@@ -13,7 +13,7 @@ Add this to your application's `shard.yml`:
 ```yaml
 dependencies:
   gsl:
-    github: ruivieira/crystal-gsl
+    github: konovod/crystal-gsl
 ```
 
 ## System dependencies
@@ -43,11 +43,13 @@ require "gsl"
 
 ### Documentation
 
-Full documentation can be found at [here](https://ruivieira.github.io/crystal-gsl/).
+Full documentation can be found at [here](https://konovod.github.io/crystal-gsl/).
 
 ### Examples
 
-Examples can be found [here](https://ruivieira.github.io/projects/crystal-gsl/).
+Examples can be found [here](https://ruivieira.github.io/projects/crystal-gsl/). (broken link)
+
+You can check `spec` directory for some simple examples
 
 _Warning_:
 
@@ -75,13 +77,18 @@ Implementation list:
   - Sparse and dense matrices
   - Histograms
   - Permutations
+- Analysis
+  - Numerical integration
+  - Numerical differentiation
+  - Ordinary differential equations
 - Optimization
   - Scalar functions minimization
   - Scalar functions root finding
+- Physical constants
 
 ## Contributing
 
-1. Fork it ( https://github.com/ruivieira/crystal-gsl/fork )
+1. Fork it ( https://github.com/konovod/crystal-gsl/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
@@ -89,6 +96,8 @@ Implementation list:
 
 ## Contributors
 
-- [ruivieira](https://github.com/ruivieira) Rui Vieira - creator, maintainer
-- [dylandy](https://github.com/dylandy) Dylandy Chang - developer, maintainer
-- [konovod](https://github.com/konovod) Andrey Konovod - developer
+I'm maintaining this fork for now, at least until it is merged to origin
+
+- [ruivieira](https://github.com/ruivieira) Rui Vieira - creator
+- [dylandy](https://github.com/dylandy) Dylandy Chang - developer
+- [konovod](https://github.com/konovod) Andrey Konovod - developer, maintainer
