@@ -34,4 +34,15 @@ describe GSL do
       x.should be_close Complex.new(-0.05897507442156586346, 0.48722235829452235710), 1e-14
     end
   end
+
+  describe "functions defined with def_function_array" do
+    it "must return the correct value" do
+      x = GSL.bessel_Jn(3, 38, 1.0)
+      x.size.should eq(38 - 3 + 1)
+      x[0].should be_close 0.0195633539826684059190, 1e-14
+      x[1].should be_close 0.0024766389641099550438, 1e-14
+      x[10].should be_close 1.9256167644801728904e-14, 1e-24
+      x[35].should be_close 6.911232970971626272e-57, 1e-64
+    end
+  end
 end
