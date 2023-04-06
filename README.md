@@ -59,7 +59,7 @@ _Warning_:
 
 ## Status
 
-see [TODO.md](https://github.com/konovod/crystal-gsl/TODO.md) for list on what is done\missing
+see [TODO.md](https://github.com/konovod/crystal-gsl/blob/master/TODO.md) for list on what is done\missing
 
 Implementation list:
 
