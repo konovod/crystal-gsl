@@ -5,6 +5,8 @@ describe GSL do
     it "must return the correct value" do
       x = GSL.lngamma(0.1)
       x.should eq 2.2527126517342047
+      x = GSL.chi(-1)
+      x.should eq 0.8378669409802082409
     end
   end
 
@@ -23,6 +25,13 @@ describe GSL do
       x.should eq -4.087949444130970617
       x = GSL.bessel_Jn(5, 2.0)
       x.should be_close 0.007039629755871685484, 1e-14
+    end
+  end
+
+  describe "functions defined with def_function_complex" do
+    it "must return the correct value" do
+      x = GSL.dilog(0.5.i)
+      x.should be_close Complex.new(-0.05897507442156586346, 0.48722235829452235710), 1e-14
     end
   end
 end

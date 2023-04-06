@@ -2,9 +2,10 @@ require "./libgsl.cr"
 
 module GSL
   module SpecFunctions
-    private macro def_function(fn)
-      def {{fn.id[0..0].downcase}}{{fn.id[1..]}}(x : Float64) : Float64 # fixing first capital letter
-        code = LibGSL.gsl_sf_{{fn}}_e(x, out result)
+    private macro def_function(fn, fn_raw = nil)
+      {% fn_raw = fn unless fn_raw %}
+      def {{fn}}(x : Float64) : Float64
+        code = LibGSL.gsl_sf_{{fn_raw}}_e(x, out result)
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_sf_{{fn}}_e")
         result.val
       end
@@ -37,6 +38,14 @@ module GSL
         code = LibGSL.gsl_sf_{{fn}}_e({{*args.map(&.var)}}, precision, out result)
         check_return_code(LibGSL::Code.new(code), "gsl_sf_{{fn}}_e")
         result.val
+      end
+    end
+
+    private macro def_function_complex(fn, fn_raw = fn)
+      def {{fn}}(x : Complex) : Complex # fixing first capital letter
+        code = LibGSL.gsl_sf_complex_{{fn_raw}}_e(x.real, x.imag, out result_re, out result_im)
+        GSL.check_return_code(LibGSL::Code.new(code), "gsl_sf_{{fn}}_e")
+        Complex.new(result_re.val, result_im.val)
       end
     end
 
@@ -135,9 +144,9 @@ module GSL
     def_function(debye_5)
     def_function(debye_6)
     def_function(dilog)
-    # fun gsl_sf_complex_dilog_xy_e(x : LibC::Double, y : LibC::Double, result_re : Gsl_sf_result*, result_im : Gsl_sf_result*) : LibC::Int
+    def_function_complex(dilog, dilog_xy)
+    def_function_complex(spence, spence_xy)
     # fun gsl_sf_complex_dilog_e(r : LibC::Double, theta : LibC::Double, result_re : Gsl_sf_result*, result_im : Gsl_sf_result*) : LibC::Int
-    # fun gsl_sf_complex_spence_xy_e(x : LibC::Double, y : LibC::Double, real_sp : Gsl_sf_result*, imag_sp : Gsl_sf_result*) : LibC::Int
     def_function_with_args(multiply, x : Float64, y : Float64)
     def_function_with_args(multiply_err, x : Float64, dx : Float64, y : Float64, dy : Float64)
     def_function_with_args_mode(ellint_Kcomp, k : Float64)
@@ -180,11 +189,11 @@ module GSL
     def_function_with_args(expint_En_scaled, n : Int32, x : Float64)
     def_function(expint_Ei)
     def_function(expint_Ei_scaled)
-    def_function(Shi)
-    def_function(Chi)
+    def_function(shi, Shi)
+    def_function(chi, Chi)
     def_function(expint_3)
-    def_function(Si)
-    def_function(Ci)
+    def_function(si, Si)
+    def_function(ci, Ci)
     def_function(atanint)
     def_function(fermi_dirac_m1)
     def_function(fermi_dirac_0)
@@ -222,9 +231,6 @@ module GSL
     def_function_with_args(gegenpoly_1, lambda : Float64, x : Float64)
     def_function_with_args(gegenpoly_2, lambda : Float64, x : Float64)
     def_function_with_args(gegenpoly_3, lambda : Float64, x : Float64)
-    # fun gsl_sf_gegenpoly_1(lambda : LibC::Double, x : LibC::Double) : LibC::Double
-    # fun gsl_sf_gegenpoly_2(lambda : LibC::Double, x : LibC::Double) : LibC::Double
-    # fun gsl_sf_gegenpoly_3(lambda : LibC::Double, x : LibC::Double) : LibC::Double
     def_function_with_args(gegenpoly_n, n : Int32, lambda : Float64, x : Float64)
     # fun gsl_sf_gegenpoly_array(nmax : LibC::Int, lambda : LibC::Double, x : LibC::Double, result_array : LibC::Double*) : LibC::Int
     def_function_with_args(hermite_prob, n : Int32, x : Float64)
@@ -272,9 +278,6 @@ module GSL
     def_function_with_args(laguerre_1, a : Float64, x : Float64)
     def_function_with_args(laguerre_2, a : Float64, x : Float64)
     def_function_with_args(laguerre_3, a : Float64, x : Float64)
-    # fun gsl_sf_laguerre_1(a : LibC::Double, x : LibC::Double) : LibC::Double
-    # fun gsl_sf_laguerre_2(a : LibC::Double, x : LibC::Double) : LibC::Double
-    # fun gsl_sf_laguerre_3(a : LibC::Double, x : LibC::Double) : LibC::Double
     def_function_with_args(laguerre_n, n : Int32, a : Float64, x : Float64)
     def_function(lambert_W0)
     def_function(lambert_Wm1)
@@ -349,7 +352,7 @@ module GSL
     def_function_with_args(psi_int, n : Int32)
     def_function(psi)
     def_function_with_args(psi_1piy, y : Float64)
-    # fun gsl_sf_complex_psi_e(x : LibC::Double, y : LibC::Double, result_re : Gsl_sf_result*, result_im : Gsl_sf_result*) : LibC::Int
+    def_function_complex(psi)
     def_function_with_args(psi_1_int, n : Int32)
     def_function(psi_1)
     def_function_with_args(psi_n, n : Int32, x : Float64)
@@ -364,9 +367,9 @@ module GSL
     def_function(sin)
     def_function(cos)
     def_function_with_args(hypot, x : Float64, y : Float64)
-    # fun gsl_sf_complex_sin_e(zr : LibC::Double, zi : LibC::Double, szr : Gsl_sf_result*, szi : Gsl_sf_result*) : LibC::Int
-    # fun gsl_sf_complex_cos_e(zr : LibC::Double, zi : LibC::Double, czr : Gsl_sf_result*, czi : Gsl_sf_result*) : LibC::Int
-    # fun gsl_sf_complex_logsin_e(zr : LibC::Double, zi : LibC::Double, lszr : Gsl_sf_result*, lszi : Gsl_sf_result*) : LibC::Int
+    def_function_complex(sin)
+    def_function_complex(cos)
+    def_function_complex(logsin)
     def_function(sinc)
     def_function(lnsinh)
     def_function(lncosh)
