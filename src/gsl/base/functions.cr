@@ -102,7 +102,7 @@ module GSL
     def_function(bessel_j2)
     def_function_with_args(bessel_jl, l : Int32, x : Float64)
     def_function_array(bessel_jl, lmax + 1, lmax : Int32, x : Float64)
-    # fun gsl_sf_bessel_jl_steed_array(lmax : Int32, x : Float64, jl_x_array : LibC::Double*) : LibC::Int
+    def_function_array(bessel_jl_steed, lmax + 1, lmax : Int32, x : Float64)
     def_function(bessel_y0)
     def_function(bessel_y1)
     def_function(bessel_y2)
@@ -139,7 +139,7 @@ module GSL
     # fun gsl_sf_coulomb_wave_FGp_array(lam_min : Float64, kmax : Int32, eta : Float64, x : Float64, fc_array : LibC::Double*, fcp_array : LibC::Double*, gc_array : LibC::Double*, gcp_array : LibC::Double*, f_exponent : LibC::Double*, g_exponent : LibC::Double*) : LibC::Int
     # fun gsl_sf_coulomb_wave_sphF_array(lam_min : Float64, kmax : Int32, eta : Float64, x : Float64, fc_array : LibC::Double*, f_exponent : LibC::Double*) : LibC::Int
     def_function_with_args(coulomb_CL, l : Float64, eta : Float64)
-    # fun gsl_sf_coulomb_CL_array(lmin : Float64, kmax : Int32, eta : Float64, cl : LibC::Double*) : LibC::Int
+    def_function_array(coulomb_CL, kmax + 1, lmin : Float64, kmax : Int32, eta : Float64)
     def_function_with_args(coupling_3j, two_ja : Int32, two_jb : Int32, two_jc : Int32, two_ma : Int32, two_mb : Int32, two_mc : Int32)
     def_function_with_args(coupling_6j, two_ja : Int32, two_jb : Int32, two_jc : Int32, two_jd : Int32, two_je : Int32, two_jf : Int32)
     def_function_with_args(coupling_RacahW, two_ja : Int32, two_jb : Int32, two_jc : Int32, two_jd : Int32, two_je : Int32, two_jf : Int32)
