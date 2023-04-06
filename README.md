@@ -81,10 +81,14 @@ Implementation list:
   - Numerical integration
   - Numerical differentiation
   - Ordinary differential equations
+  - Polynomials
 - Optimization
   - Scalar functions minimization
   - Scalar functions root finding
+- Approximation
+  - Chebyshev approximation
 - Physical constants
+- Special functions (not all, but most)
 
 ## Contributing
 
