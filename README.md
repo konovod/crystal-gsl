@@ -7,10 +7,6 @@
 
 GNU Scientific Library (GSL) binding for Crystal
 
-This project is a fork of https://github.com/ruivieira/crystal-gsl 
-
-Original shard still has not merged my PR, so I'm maintining my fork now.
-
 ## Installation
 
 Add this to your application's `shard.yml`:
