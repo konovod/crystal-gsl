@@ -90,6 +90,7 @@ Implementation list:
 - Approximation
   - Chebyshev approximation
   - B Splines
+  - Interpolation
 - Physical constants
 - Special functions (not all, but most)
 

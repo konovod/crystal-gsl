@@ -14,8 +14,6 @@ module GSL
       Akima
       AkimaPeriodic
       Steffen
-      Bilinear
-      Bicubic
 
       def to_unsafe
         case self
@@ -33,10 +31,6 @@ module GSL
           LibGSL.gsl_interp_akima_periodic
         in .steffen?
           LibGSL.gsl_interp_steffen
-        in .bilinear?
-          LibGSL.gsl_interp2d_bilinear
-        in .bicubic?
-          LibGSL.gsl_interp2d_bicubic
         end
       end
 
@@ -94,37 +88,42 @@ module GSL
       return if @raw.null?
       LibGSL.gsl_interp_free(@raw)
       LibGSL.gsl_interp_accel_free(@acc)
-      @raw = Pointer(LibGSL::Gsl_spline).null
+      @raw = Pointer(LibGSL::Gsl_interp).null
     end
 
     def finalize
       free
     end
 
-    enum Derivative
+    enum DerivativeOrder
       Function
-      Derivative1
-      Derivative2
-      Integral
+      FirstDerivative
+      SecondDerivative
     end
 
-    def eval(x, deriv : Derivative = Derivative::Function)
+    def eval(x, deriv : DerivativeOrder = DerivativeOrder::Function)
       result = 0.0
       case deriv
       in .function?
         code = LibGSL.gsl_interp_eval_e(@raw, @xa, @ya, x, @acc, pointerof(result))
-      in .derivative1?
+        GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp_eval_e")
+      in .first_derivative?
         code = LibGSL.gsl_interp_eval_deriv_e(@raw, @xa, @ya, x, @acc, pointerof(result))
-      in .derivative2?
+        GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp_eval_deriv_e")
+      in .second_derivative?
         code = LibGSL.gsl_interp_eval_deriv2_e(@raw, @xa, @ya, x, @acc, pointerof(result))
-      in .integral?
-        code = LibGSL.gsl_interp_eval_integ_e(@raw, @xa, @ya, x, @acc, pointerof(result))
+        GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp_eval_deriv2_e")
       end
-      GSL.check_return_code(code)
       result
     end
 
-    def find(x)
+    def integrate(a, b)
+      code = LibGSL.gsl_interp_eval_integ_e(@raw, @xa, @ya, a, b, @acc, out result)
+      GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp_eval_integ_e")
+      result
+    end
+
+    def x_index(x)
       LibGSL.gsl_interp_accel_find(@acc, @xa, size, x)
     end
   end
