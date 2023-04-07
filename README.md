@@ -3,8 +3,13 @@
 [![Linux CI](https://github.com/konovod/crystal-gsl/actions/workflows/linux.yml/badge.svg)](https://github.com/konovod/crystal-gsl/actions/workflows/linux.yml)
 [![MacOS CI](https://github.com/konovod/crystal-gsl/actions/workflows/macos.yml/badge.svg)](https://github.com/konovod/crystal-gsl/actions/workflows/macos.yml)
 [![Windows CI](https://github.com/konovod/crystal-gsl/actions/workflows/windows.yml/badge.svg)](https://github.com/konovod/crystal-gsl/actions/workflows/windows.yml)
+[![API Documentation](https://img.shields.io/website?down_color=red&down_message=Offline&label=API%20Documentation&up_message=Online&url=https%3A%2F%2Fkonovod.github.io%2Fcrystal-gsl%2F)](https://konovod.github.io/crystal-gsl) 
 
 GNU Scientific Library (GSL) binding for Crystal
+
+This project is a fork of https://github.com/ruivieira/crystal-gsl 
+
+Original shard still has not merged my PR, so I'm maintining my fork now.
 
 ## Installation
 
