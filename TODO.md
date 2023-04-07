@@ -8,7 +8,7 @@ Status of GSL areas (list taken from [GSL docs](https://www.gnu.org/software/gsl
 | Polynomials | Done |  |
 | Special Functions | Partially done |  |
 | Vectors and Matrices | Partially done | lack VectorView, row swapping, maybe other minor features |
-| Permutations | - | Not a priority for me (PR welcome though) |
+| Permutations | Partially done | Not a priority for me (PR welcome though) |
 | Combinations | - | Not a priority for me (PR welcome though) |
 | Multisets | - | Not a priority for me (PR welcome though) |
 | Sorting | Not planned | Already in Crystal stdlib |
@@ -24,7 +24,7 @@ Status of GSL areas (list taken from [GSL docs](https://www.gnu.org/software/gsl
 | Running Statistics | - | Not a priority for me (PR welcome though) |
 | Moving Window Statistics | - | Not a priority for me (PR welcome though) |
 | Digital Filtering | - | Not a priority for me (PR welcome though) |
-| Histograms | - | Not a priority for me (PR welcome though) |
+| Histograms | Partially done | Not a priority for me (PR welcome though) |
 | N-tuples | - | Not a priority for me (PR welcome though) |
 | Monte Carlo Integration | - |  |
 | Simulated Annealing | - |  |
