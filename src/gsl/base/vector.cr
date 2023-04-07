@@ -19,6 +19,10 @@ module GSL
         owner: 0)
     end
 
+    def to_unsafe
+      pointerof(@raw)
+    end
+
     def inspect
       "GSL::Vector: #{self.to_array}"
     end

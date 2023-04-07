@@ -56,6 +56,10 @@ module GSL
       @pointer = LibGSL.gsl_matrix_calloc(@rows, @columns)
     end
 
+    def to_unsafe
+      pointer
+    end
+
     def ==(m : GSL::DenseMatrix)
       LibGSL.gsl_matrix_equal(@pointer, m.pointer) == 1 ? true : false
     end

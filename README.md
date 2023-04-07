@@ -89,6 +89,7 @@ Implementation list:
   - Scalar functions root finding
 - Approximation
   - Chebyshev approximation
+  - B Splines
 - Physical constants
 - Special functions (not all, but most)
 
