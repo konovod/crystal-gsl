@@ -37,6 +37,28 @@ describe GSL::Interpolate1D do
     expect_raises(GSL::Exception) { int.eval(20) }
   end
 
+  it "should allow to update x and y values" do
+    x1 = (1..100).to_a.map { |v| v / 10 }
+    y1 = x1.map { |v| Math.sin(v) }
+    x2 = x1.map { |v| v*10 }
+    y2 = x2.map { |v| Math.log(v) }
+
+    x_test1 = Math::PI/2
+    y_test1 = Math.sin(x_test1)
+    x_test2 = Math::PI*5
+    y_test2 = Math.log(x_test2)
+
+    int = GSL::Interpolate1D.new(:steffen, x1, y1)
+    int.eval(x_test1).should be_close y_test1, 1e-3
+    expect_raises(Exception) { int.update(xa: x1[1..]) }
+    int.update(xa: x2)
+    int.eval(x_test2).should be_close y_test1, 1e-3
+    int.update(ya: y2)
+    int.eval(x_test2).should be_close y_test2, 1e-3
+    int.update(x1, y1)
+    int.eval(x_test1).should be_close y_test1, 1e-3
+  end
+
   it "should evaluate direvatives at given x" do
     x = (1..100).to_a.map { |v| v / 100 }
     y = x.map { |v| Math.sin(v) }

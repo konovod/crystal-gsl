@@ -74,14 +74,18 @@ module GSL
       @xa.size
     end
 
-    # TODO - spec
-    def update(xa, ya)
-      raise ArgumentError.new("Updated xa must have same size (#{xa.size} != #{size})") unless xa.size == size
-      raise ArgumentError.new("Updated ya must have same size (#{ya.size} != #{size})") unless ya.size == size
-      @xa.copy_from(xa.to_unsafe, xa.size)
-      @ya.copy_from(ya.to_unsafe, ya.size)
+    def update(xa = nil, ya = nil)
+      return if xa.nil? && ya.nil?
+      if xa
+        raise ArgumentError.new("Updated xa must have same size (#{xa.size} != #{size})") unless xa.size == size
+        @xa.copy_from(xa.to_unsafe, xa.size)
+        LibGSL.gsl_interp_accel_reset(@acc)
+      end
+      if ya
+        raise ArgumentError.new("Updated ya must have same size (#{ya.size} != #{size})") unless ya.size == size
+        @ya.copy_from(ya.to_unsafe, ya.size)
+      end
       LibGSL.gsl_interp_init(@raw, @xa, @ya, @xa.size)
-      LibGSL.gsl_interp_accel_reset(@acc)
     end
 
     def free
@@ -195,7 +199,7 @@ module GSL
       {@xa.size, @ya.size}
     end
 
-    def update(xa, ya, za)
+    def update(xa = nil, ya = nil, za = nil)
       return if xa.nil? && ya.nil? && za.nil?
       if xa
         raise ArgumentError.new("Updated xa must have same size (#{xa.size} != #{size[0]})") unless xa.size == size[0]
