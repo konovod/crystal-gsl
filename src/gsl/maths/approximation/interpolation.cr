@@ -74,6 +74,7 @@ module GSL
       @xa.size
     end
 
+    # TODO - spec
     def update(xa, ya)
       raise ArgumentError.new("Updated xa must have same size (#{xa.size} != #{size})") unless xa.size == size
       raise ArgumentError.new("Updated ya must have same size (#{ya.size} != #{size})") unless ya.size == size
@@ -227,12 +228,12 @@ module GSL
 
     enum DerivativeOrder
       Function
-      Extrapolation
+      Extrapolate
       DfDx
       DfDy
-      Df2Dx2
-      Df2Dy2
-      Df2DxDy
+      D2fDx2
+      D2fDy2
+      D2fDxDy
     end
 
     def eval(x, y, deriv : DerivativeOrder = DerivativeOrder::Function)
@@ -241,7 +242,7 @@ module GSL
       in .function?
         code = LibGSL.gsl_interp2d_eval_e(@raw, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp2d_eval_e")
-      in .extrapolation?
+      in .extrapolate?
         code = LibGSL.gsl_interp2d_eval_extrap_e(@raw, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp2d_eval_extrap_e")
       in .df_dx?
@@ -250,13 +251,13 @@ module GSL
       in .df_dy?
         code = LibGSL.gsl_interp2d_eval_deriv_y_e(@raw, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp2d_eval_deriv_y_e")
-      in .df2_dx2?
+      in .d2f_dx2?
         code = LibGSL.gsl_interp2d_eval_deriv_xx_e(@raw, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp2d_eval_deriv_xx_e")
-      in .df2_dx_dy?
+      in .d2f_dx_dy?
         code = LibGSL.gsl_interp2d_eval_deriv_xy_e(@raw, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp2d_eval_deriv_xy_e")
-      in .df2_dy2?
+      in .d2f_dy2?
         code = LibGSL.gsl_interp2d_eval_deriv_yy_e(@raw, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp2d_eval_deriv_yy_e")
       end
