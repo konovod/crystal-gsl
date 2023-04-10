@@ -1,8 +1,9 @@
 name: gsl
-version: 0.1.0
+version: 0.2.0
 
 authors:
   - Rui Vieira <ruidevieira@googlemail.com>
   - Dylandy Chang <dylandy.chang@googlemail.com>
+  - Andrey Konovod <konovod@gmail.com>
 
 license: MIT
