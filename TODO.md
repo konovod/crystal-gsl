@@ -29,7 +29,7 @@ Status of GSL areas (list taken from [GSL docs](https://www.gnu.org/software/gsl
 | Monte Carlo Integration | - |  |
 | Simulated Annealing | - |  |
 | Ordinary Differential Equations | Done |  |
-| Interpolation | Partially done | 2D is missing |
+| Interpolation | Done |  |
 | Numerical Differentiation | Done |  |
 | Chebyshev Approximations | Done |  |
 | Series Acceleration | - |  |
