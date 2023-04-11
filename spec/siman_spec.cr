@@ -16,16 +16,18 @@ record CartesianPos < GSL::Siman::Configuration, x : Float64 do
 end
 
 describe GSL::Siman do
-  params = GSL::Siman::Params.new(
-    n_tries: 200,
-    iters_fixed_t: 1000,
-    step_size: 1.0,
-    k: 1.0,
-    t_initial: 0.008,
-    mu_t: 1.003,
-    t_min: 2.0e-6
-  )
-  GSL::Siman.solve(CartesianPos.new(15.5), params, false).x.should be_close 1.36313, 1e-4
+  it "should find global minimum starting from local minimum (trivial case)" do
+    params = GSL::Siman::Params.new(
+      n_tries: 200,
+      iters_fixed_t: 1000,
+      step_size: 1.0,
+      k: 1.0,
+      t_initial: 0.008,
+      mu_t: 1.003,
+      t_min: 2.0e-6
+    )
+    GSL::Siman.solve(CartesianPos.new(15.5), params, false).x.should be_close 1.36313, 1e-4
+  end
 end
 
 # TODO - second, complex spec
