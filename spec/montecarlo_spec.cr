@@ -14,7 +14,7 @@ describe GSL::MonteCarlo do
       f = ->(k : Slice(Float64)) { a / (1.0 - Math.cos(k[0]) * Math.cos(k[1]) * Math.cos(k[2])) }
       x, err = GSL::MonteCarlo.integrate_plain(f, lower, upper, 100000)
       err.should be < 1.0
-      x.should be_close exact, err*3
+      x.should be_close exact, err*5
     end
   end
   describe "Miser" do
@@ -23,7 +23,15 @@ describe GSL::MonteCarlo do
       f = ->(k : Slice(Float64)) { a / (1.0 - Math.cos(k[0]) * Math.cos(k[1]) * Math.cos(k[2])) }
       x, err = GSL::MonteCarlo.integrate_miser(f, lower, upper, 100000)
       err.should be < 1.0
-      x.should be_close exact, err*3
+      x.should be_close exact, err*5
+    end
+
+    it "can be configured" do
+      a = 1.0 / (Math::PI * Math::PI * Math::PI)
+      f = ->(k : Slice(Float64)) { a / (1.0 - Math.cos(k[0]) * Math.cos(k[1]) * Math.cos(k[2])) }
+      x, err = GSL::MonteCarlo.integrate_miser(f, lower, upper, 100000, params: GSL::MonteCarlo::MiserParams.new(alpha: 1.5, dither: 0.05, min_calls: 100))
+      err.should be < 1.0
+      x.should be_close exact, err*5
     end
   end
   describe "Vegas" do

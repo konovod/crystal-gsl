@@ -10,12 +10,34 @@ module GSL::MonteCarlo
     return result, err
   end
 
-  def self.integrate_miser(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random::DEFAULT)
+  record MiserParams,
+    estimate_frac : Float64 = 0.1,
+    min_calls : Int32? = nil,
+    min_calls_per_bisection : Int32? = nil,
+    alpha : Float64 = 2.0,
+    dither : Float64 = 0.0 do
+    def to_unsafe(dimensions = 1)
+      min_calls = self.min_calls || 16*dimensions
+      min_calls_per_bisection = self.min_calls_per_bisection || 32*min_calls
+      LibGSL::Gsl_monte_miser_params.new(
+        estimate_frac: estimate_frac,
+        min_calls: min_calls,
+        min_calls_per_bisection: min_calls_per_bisection,
+        alpha: alpha,
+        dither: dither)
+    end
+  end
+
+  def self.integrate_miser(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random::DEFAULT, params : MiserParams? = nil)
     raise ArgumentError.new("xl.size != xu.size (#{xl.size} != #{xu.size})") unless xl.size == xu.size
     dim = xl.size
     workspace = LibGSL.gsl_monte_miser_alloc(dim)
     rng = GSL.wrap_rng(random)
     f = GSL.wrap_function_monte(function, dim)
+    if params
+      aparams = params.to_unsafe(dim)
+      LibGSL.gsl_monte_miser_params_set(workspace, pointerof(aparams))
+    end
     LibGSL.gsl_monte_miser_integrate(pointerof(f), xl, xu, dim, calls, pointerof(rng), workspace, out result, out err)
     LibGSL.gsl_monte_miser_free(workspace)
     return result, err
