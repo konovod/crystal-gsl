@@ -42,5 +42,14 @@ describe GSL::MonteCarlo do
       err.should be < 1.0
       x.should be_close exact, err*10
     end
+
+    it "can be configured" do
+      a = 1.0 / (Math::PI * Math::PI * Math::PI)
+      f = ->(k : Slice(Float64)) { a / (1.0 - Math.cos(k[0]) * Math.cos(k[1]) * Math.cos(k[2])) }
+      params = GSL::MonteCarlo::VegasParams.new(alpha: 1.3, iterations: 10, sampling: :stratified)
+      x, err = GSL::MonteCarlo.integrate_vegas(f, lower, upper, 100000, params: params)
+      err.should be < 1.0
+      x.should be_close exact, err*5
+    end
   end
 end

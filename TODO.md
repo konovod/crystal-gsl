@@ -26,7 +26,7 @@ Status of GSL areas (list taken from [GSL docs](https://www.gnu.org/software/gsl
 | Digital Filtering | - | Not a priority for me (PR welcome though) |
 | Histograms | Partially done | Not a priority for me (PR welcome though) |
 | N-tuples | - | Not a priority for me (PR welcome though) |
-| Monte Carlo Integration | Partially done |  |
+| Monte Carlo Integration | Partially done | Vegas chisq estimate is not supported |
 | Simulated Annealing | Done |  |
 | Ordinary Differential Equations | Done |  |
 | Interpolation | Done |  |

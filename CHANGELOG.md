@@ -15,6 +15,7 @@
 * Support for Basis Splines
 * Support for Physical Constants
 * Support for Simulated Annealing
+* Support for Monte Carlo Integration
 
 # pre-release
 

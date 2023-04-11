@@ -85,6 +85,7 @@ Implementation list:
   - Numerical differentiation
   - Ordinary differential equations
   - Polynomials
+  - Monte Carlo Integration
 - Optimization
   - Scalar functions minimization
   - Scalar functions root finding
