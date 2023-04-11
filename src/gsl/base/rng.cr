@@ -5,10 +5,7 @@ module GSL
     min: 0,
     size: sizeof(LibC::SizeT),
     set: ->(ptr : Void*, seed : LibC::ULong) {},
-    get: ->(ptr : Void*) do
-      v = ptr.as(Box(Random)).object.next_int
-      pointerof(v).as(UInt32*).value
-    end,
+    get: ->(ptr : Void*) { ptr.as(Box(Random)).object.rand(LibC::ULong::MIN..LibC::ULong::MAX) },
     get_double: ->(ptr : Void*) { ptr.as(Box(Random)).object.next_float }
   )
 
