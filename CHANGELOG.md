@@ -7,7 +7,6 @@
 * Support for Special Functions
 * Support for Numerical Integration
 * Support for Ordinary Differential Equations
-
 * Support for Interpolation
 * Support for Numerical Differentiation
 * Support for Chebyshev Approximations
@@ -15,6 +14,7 @@
 * Support for One Dimensional Minimization
 * Support for Basis Splines
 * Support for Physical Constants
+* Support for Simulated Annealing
 
 # pre-release
 

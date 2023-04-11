@@ -88,6 +88,7 @@ Implementation list:
 - Optimization
   - Scalar functions minimization
   - Scalar functions root finding
+  - Simulated Annealing
 - Approximation
   - Chebyshev approximation
   - B Splines

@@ -27,7 +27,7 @@ Status of GSL areas (list taken from [GSL docs](https://www.gnu.org/software/gsl
 | Histograms | Partially done | Not a priority for me (PR welcome though) |
 | N-tuples | - | Not a priority for me (PR welcome though) |
 | Monte Carlo Integration | - |  |
-| Simulated Annealing | - |  |
+| Simulated Annealing | Done |  |
 | Ordinary Differential Equations | Done |  |
 | Interpolation | Done |  |
 | Numerical Differentiation | Done |  |
