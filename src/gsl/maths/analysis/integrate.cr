@@ -38,6 +38,7 @@ module GSL::Integration
     GSL_INTEG_GAUSS61 = 6
   end
 
+  # TODO - reentrant?
   @@workspace = Pointer(LibGSL::Gsl_integration_workspace).null
   @@workspace_size = 0
 
@@ -116,6 +117,7 @@ module GSL::Integration
     return result, abserr
   end
 
+  # TODO - reentrant?
   @@cquad_workspace = Pointer(LibGSL::Gsl_integration_cquad_workspace).null
   @@cquad_workspace_size = 0
 
@@ -134,6 +136,7 @@ module GSL::Integration
     return result, abserr, neval
   end
 
+  # TODO - reentrant?
   @@romberg_workspace = Pointer(LibGSL::Gsl_integration_romberg_workspace).null
   @@romberg_workspace_size = 0
 
