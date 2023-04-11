@@ -4660,6 +4660,7 @@ lib LibGSL
   fun gsl_multifit_nlinear_default_parameters : Gsl_multifit_nlinear_parameters
   fun gsl_multifit_nlinear_init(x : Gsl_vector*, fdf : Gsl_multifit_nlinear_fdf*, w : Gsl_multifit_nlinear_workspace*) : LibC::Int
   fun gsl_multifit_nlinear_winit(x : Gsl_vector*, wts : Gsl_vector*, fdf : Gsl_multifit_nlinear_fdf*, w : Gsl_multifit_nlinear_workspace*) : LibC::Int
+  @[Raises]
   fun gsl_multifit_nlinear_iterate(w : Gsl_multifit_nlinear_workspace*) : LibC::Int
   fun gsl_multifit_nlinear_avratio(w : Gsl_multifit_nlinear_workspace*) : LibC::Double
   fun gsl_multifit_nlinear_driver(maxiter : LibC::SizeT, xtol : LibC::Double, gtol : LibC::Double, ftol : LibC::Double, callback : (LibC::SizeT, Void*, Gsl_multifit_nlinear_workspace* -> Void), callback_params : Void*, info : LibC::Int*, w : Gsl_multifit_nlinear_workspace*) : LibC::Int
@@ -4710,6 +4711,7 @@ lib LibGSL
 
   fun gsl_multifit_fsolver_free(s : Gsl_multifit_fsolver*)
   fun gsl_multifit_fsolver_set(s : Gsl_multifit_fsolver*, f : Gsl_multifit_function*, x : Gsl_vector*) : LibC::Int
+  @[Raises]
   fun gsl_multifit_fsolver_iterate(s : Gsl_multifit_fsolver*) : LibC::Int
   fun gsl_multifit_fsolver_driver(s : Gsl_multifit_fsolver*, maxiter : LibC::SizeT, epsabs : LibC::Double, epsrel : LibC::Double) : LibC::Int
   fun gsl_multifit_fsolver_name(s : Gsl_multifit_fsolver*) : LibC::Char*
@@ -4753,6 +4755,7 @@ lib LibGSL
 
   fun gsl_multifit_fdfsolver_set(s : Gsl_multifit_fdfsolver*, fdf : Gsl_multifit_function_fdf*, x : Gsl_vector*) : LibC::Int
   fun gsl_multifit_fdfsolver_wset(s : Gsl_multifit_fdfsolver*, f : Gsl_multifit_function_fdf*, x : Gsl_vector*, wts : Gsl_vector*) : LibC::Int
+  @[Raises]
   fun gsl_multifit_fdfsolver_iterate(s : Gsl_multifit_fdfsolver*) : LibC::Int
   fun gsl_multifit_fdfsolver_driver(s : Gsl_multifit_fdfsolver*, maxiter : LibC::SizeT, xtol : LibC::Double, gtol : LibC::Double, ftol : LibC::Double, info : LibC::Int*) : LibC::Int
   fun gsl_multifit_fdfsolver_jac(s : Gsl_multifit_fdfsolver*, j : Gsl_matrix*) : LibC::Int
@@ -4794,6 +4797,7 @@ lib LibGSL
   fun gsl_multifit_fdfridge_wset2(w : Gsl_multifit_fdfridge*, f : Gsl_multifit_function_fdf*, x : Gsl_vector*, lambda : Gsl_vector*, wts : Gsl_vector*) : LibC::Int
   fun gsl_multifit_fdfridge_set3(w : Gsl_multifit_fdfridge*, f : Gsl_multifit_function_fdf*, x : Gsl_vector*, l : Gsl_matrix*) : LibC::Int
   fun gsl_multifit_fdfridge_wset3(w : Gsl_multifit_fdfridge*, f : Gsl_multifit_function_fdf*, x : Gsl_vector*, l : Gsl_matrix*, wts : Gsl_vector*) : LibC::Int
+  @[Raises]
   fun gsl_multifit_fdfridge_iterate(w : Gsl_multifit_fdfridge*) : LibC::Int
   fun gsl_multifit_fdfridge_driver(w : Gsl_multifit_fdfridge*, maxiter : LibC::SizeT, xtol : LibC::Double, gtol : LibC::Double, ftol : LibC::Double, info : LibC::Int*) : LibC::Int
 
@@ -4927,6 +4931,7 @@ lib LibGSL
   fun gsl_multilarge_nlinear_default_parameters : Gsl_multilarge_nlinear_parameters
   fun gsl_multilarge_nlinear_init(x : Gsl_vector*, fdf : Gsl_multilarge_nlinear_fdf*, w : Gsl_multilarge_nlinear_workspace*) : LibC::Int
   fun gsl_multilarge_nlinear_winit(x : Gsl_vector*, wts : Gsl_vector*, fdf : Gsl_multilarge_nlinear_fdf*, w : Gsl_multilarge_nlinear_workspace*) : LibC::Int
+  @[Raises]
   fun gsl_multilarge_nlinear_iterate(w : Gsl_multilarge_nlinear_workspace*) : LibC::Int
   fun gsl_multilarge_nlinear_avratio(w : Gsl_multilarge_nlinear_workspace*) : LibC::Double
   fun gsl_multilarge_nlinear_rcond(rcond : LibC::Double*, w : Gsl_multilarge_nlinear_workspace*) : LibC::Int
@@ -4983,6 +4988,7 @@ lib LibGSL
   fun gsl_multimin_fminimizer_set(s : Gsl_multimin_fminimizer*, f : Gsl_multimin_function*, x : Gsl_vector*, step_size : Gsl_vector*) : LibC::Int
   fun gsl_multimin_fminimizer_free(s : Gsl_multimin_fminimizer*)
   fun gsl_multimin_fminimizer_name(s : Gsl_multimin_fminimizer*) : LibC::Char*
+  @[Raises]
   fun gsl_multimin_fminimizer_iterate(s : Gsl_multimin_fminimizer*) : LibC::Int
   fun gsl_multimin_fminimizer_x(s : Gsl_multimin_fminimizer*) : Gsl_vector*
   fun gsl_multimin_fminimizer_minimum(s : Gsl_multimin_fminimizer*) : LibC::Double
@@ -5014,6 +5020,7 @@ lib LibGSL
   fun gsl_multimin_fdfminimizer_set(s : Gsl_multimin_fdfminimizer*, fdf : Gsl_multimin_function_fdf*, x : Gsl_vector*, step_size : LibC::Double, tol : LibC::Double) : LibC::Int
   fun gsl_multimin_fdfminimizer_free(s : Gsl_multimin_fdfminimizer*)
   fun gsl_multimin_fdfminimizer_name(s : Gsl_multimin_fdfminimizer*) : LibC::Char*
+  @[Raises]
   fun gsl_multimin_fdfminimizer_iterate(s : Gsl_multimin_fdfminimizer*) : LibC::Int
   fun gsl_multimin_fdfminimizer_restart(s : Gsl_multimin_fdfminimizer*) : LibC::Int
   fun gsl_multimin_fdfminimizer_x(s : Gsl_multimin_fdfminimizer*) : Gsl_vector*
@@ -5050,6 +5057,7 @@ lib LibGSL
 
   fun gsl_multiroot_fsolver_free(s : Gsl_multiroot_fsolver*)
   fun gsl_multiroot_fsolver_set(s : Gsl_multiroot_fsolver*, f : Gsl_multiroot_function*, x : Gsl_vector*) : LibC::Int
+  @[Raises]
   fun gsl_multiroot_fsolver_iterate(s : Gsl_multiroot_fsolver*) : LibC::Int
   fun gsl_multiroot_fsolver_name(s : Gsl_multiroot_fsolver*) : LibC::Char*
   fun gsl_multiroot_fsolver_root(s : Gsl_multiroot_fsolver*) : Gsl_vector*
@@ -5086,6 +5094,7 @@ lib LibGSL
   end
 
   fun gsl_multiroot_fdfsolver_set(s : Gsl_multiroot_fdf_solver*, fdf : Gsl_multiroot_function_fdf*, x : Gsl_vector*) : LibC::Int
+  @[Raises]
   fun gsl_multiroot_fdfsolver_iterate(s : Gsl_multiroot_fdf_solver*) : LibC::Int
   fun gsl_multiroot_fdfsolver_free(s : Gsl_multiroot_fdf_solver*)
   fun gsl_multiroot_fdfsolver_name(s : Gsl_multiroot_fdf_solver*) : LibC::Char*
@@ -6247,6 +6256,7 @@ lib LibGSL
   fun gsl_sf_eta_int(n : LibC::Int) : LibC::Double
   fun gsl_sf_eta_e(s : LibC::Double, result : Gsl_sf_result*) : LibC::Int
   fun gsl_sf_eta(s : LibC::Double) : LibC::Double
+  @[Raises]
   fun gsl_siman_solve(r : Gsl_rng*, x0_p : Void*, ef : Gsl_siman_efunc_t, take_step : Gsl_siman_step_t, distance : Gsl_siman_metric_t, print_position : Gsl_siman_print_t, copyfunc : Gsl_siman_copy_t, copy_constructor : Gsl_siman_copy_construct_t, destructor : Gsl_siman_destroy_t, element_size : LibC::SizeT, params : Gsl_siman_params_t)
   alias Gsl_siman_efunc_t = (Void* -> LibC::Double)
   alias Gsl_siman_step_t = (Gsl_rng*, Void*, LibC::Double -> Void)
