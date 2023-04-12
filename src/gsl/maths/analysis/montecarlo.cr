@@ -78,6 +78,45 @@ module GSL::MonteCarlo
     end
   end
 
+  class VegasIntegrator
+    protected def initialize(
+      @dim : Int32,
+      @workspace : Pointer(LibGSL::Gsl_monte_vegas_state),
+      @params : VegasParams,
+      @function : Pointer(LibGSL::Gsl_monte_function),
+      @xl : Slice(Float64),
+      @xu : Slice(Float64),
+      @rng : Pointer(LibGSL::Gsl_rng)
+    )
+      @result = Float64::NAN
+      @err_estimate = Float64::NAN
+    end
+
+    getter result : Float64
+    getter err_estimate : Float64
+
+    def params(*, alpha : Float64? = @params.alpha,
+               iterations : Int32? = @params.iterations,
+               stage : VegasStage? = @params.stage,
+               sampling : VegasSampling? = @params.sampling)
+      @params = VegasParams.new(alpha, iterations, stage, sampling)
+    end
+
+    def perform(calls, *, alpha : Float64? = @params.alpha,
+                iterations : Int32? = @params.iterations,
+                stage : VegasStage? = @params.stage,
+                sampling : VegasSampling? = @params.sampling)
+      tmp_params = VegasParams.new(alpha, iterations, stage, sampling)
+      aparams = params.to_unsafe
+      LibGSL.gsl_monte_vegas_params_set(@workspace, pointerof(aparams))
+      LibGSL.gsl_monte_vegas_integrate(@function, @xl, @xu, @dim, calls, @rng, @workspace, pointerof(@result), pointerof(@err_estimate))
+    end
+
+    def chisq : Float64
+      LibGSL.gsl_monte_vegas_chisq(@workspace)
+    end
+  end
+
   def self.integrate_vegas(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random::DEFAULT, params : VegasParams? = nil)
     raise ArgumentError.new("xl.size != xu.size (#{xl.size} != #{xu.size})") unless xl.size == xu.size
     dim = xl.size
@@ -99,6 +138,42 @@ module GSL::MonteCarlo
                            stage : VegasStage = VegasStage::NewRun,
                            sampling : VegasSampling = VegasSampling::Importance)
     integrate_vegas(function, xl, xu, calls, random, VegasParams.new(alpha, iterations, stage, sampling))
+  end
+
+  def self.integrate_vegas(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), random = Random::DEFAULT, params : VegasParams? = nil, &)
+    raise ArgumentError.new("xl.size != xu.size (#{xl.size} != #{xu.size})") unless xl.size == xu.size
+    dim = xl.size
+    workspace = LibGSL.gsl_monte_vegas_alloc(dim)
+    rng = GSL.wrap_rng(random)
+    f = GSL.wrap_function_monte(function, dim)
+    params = VegasParams.new unless params
+    aparams = params.to_unsafe
+    LibGSL.gsl_monte_vegas_params_set(workspace, pointerof(aparams))
+    int = VegasIntegrator.new(
+      dim,
+      workspace,
+      params,
+      pointerof(f),
+      xl,
+      xu,
+      pointerof(rng)
+    )
+    begin
+      yield(int)
+    rescue
+      LibGSL.gsl_monte_vegas_free(workspace)
+    end
+    return int.result, int.err_estimate
+  end
+
+  def self.integrate_vegas(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), random = Random::DEFAULT, *,
+                           alpha : Float64 = 1.5,
+                           iterations : Int32 = 5,
+                           stage : VegasStage = VegasStage::NewRun,
+                           sampling : VegasSampling = VegasSampling::Importance, &)
+    integrate_vegas(function, xl, xu, random, VegasParams.new(alpha, iterations, stage, sampling)) do |v|
+      yield(v)
+    end
   end
 
   enum Algorithm
