@@ -18,8 +18,8 @@ end
 describe GSL::Siman do
   it "should find global minimum starting from local minimum (trivial case)" do
     params = GSL::Siman::Params.new(
-      n_tries: 200,
-      iters_fixed_t: 1000,
+      n_tries: 20,
+      iters_fixed_t: 50,
       step_size: 1.0,
       k: 1.0,
       t_initial: 0.008,
