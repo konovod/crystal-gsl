@@ -1,7 +1,10 @@
 name: Windows CI
 
-on: [ push, pull_request ]
-
+on:
+  - push
+  - pull_request
+  - schedule:
+      - cron: "0 6 * * 6"
 jobs:
   build:
     runs-on: windows-latest
@@ -15,18 +18,18 @@ jobs:
           path: |
             gsl/lib/x64/Debug/gsl.lib
             gsl/lib/x64/Debug/cblas.lib
-          key: static-x64-Debug-bbf6741a0759a2468c2aa40c501f9cf99b04b427
+          key: static-x64-Debug-de1c175ee239ea0f243bf72016bad2e53338e830
       - name: Checkout GSL
         if: steps.cache-gsl.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
         with:
           repository: BrianGladman/gsl
           path: gsl
-          ref: bbf6741a0759a2468c2aa40c501f9cf99b04b427 # master @ 2022-02-01
+          ref: de1c175ee239ea0f243bf72016bad2e53338e830 # master @ 2022-04-19
       - name: Add msbuild to PATH
         if: steps.cache-gsl.outputs.cache-hit != 'true'
-        uses: microsoft/setup-msbuild@v1.1          
-      - name: compile GSL    
+        uses: microsoft/setup-msbuild@v1.1
+      - name: compile GSL
         if: steps.cache-gsl.outputs.cache-hit != 'true'
         run: |
           cd gsl
@@ -35,5 +38,5 @@ jobs:
           msbuild gsl.lib.sln /p:Configuration=Debug /p:Platform=x64
       - name: copy GSL libraries
         run: |
-          echo "LIB=$(pwd)\gsl/lib/x64/Debug;${env:LIB}" >>${env:GITHUB_ENV}          
+          echo "LIB=$(pwd)\gsl/lib/x64/Debug;${env:LIB}" >>${env:GITHUB_ENV}
       - run: crystal spec
