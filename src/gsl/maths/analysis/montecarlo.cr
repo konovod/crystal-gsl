@@ -43,12 +43,10 @@ module GSL::MonteCarlo
     return result, err
   end
 
-  # state->stage = 0;
-  # state->alpha = 1.5;
-  # state->verbose = -1;
-  # state->iterations = 5;
-  # state->mode = GSL_VEGAS_MODE_;
-  # state->chisq = 0;
+  def self.integrate_miser(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random::DEFAULT,
+                           **args)
+    integrate_miser(function, xl, xu, calls, random, MiserParams.new(**args))
+  end
 
   enum VegasSampling
     Importance     =  1
@@ -93,6 +91,14 @@ module GSL::MonteCarlo
     LibGSL.gsl_monte_vegas_integrate(pointerof(f), xl, xu, dim, calls, pointerof(rng), workspace, out result, out err)
     LibGSL.gsl_monte_vegas_free(workspace)
     return result, err
+  end
+
+  def self.integrate_vegas(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random::DEFAULT, *,
+                           alpha : Float64 = 1.5,
+                           iterations : Int32 = 5,
+                           stage : VegasStage = VegasStage::NewRun,
+                           sampling : VegasSampling = VegasSampling::Importance)
+    integrate_vegas(function, xl, xu, calls, random, VegasParams.new(alpha, iterations, stage, sampling))
   end
 
   enum Algorithm
