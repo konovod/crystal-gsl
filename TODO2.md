@@ -13,6 +13,6 @@ Possible patches to GSL that could be integrated to the library
 | Multidimensional Minimization | https://savannah.gnu.org/bugs/?32776 | - |
 | One Dimensional Minimization | https://savannah.gnu.org/bugs/?45053 | Done (Reimplemented find_bracket in Crystal) |
 | Discrete Hankel Transforms | https://www.mail-archive.com/help-gsl@gnu.org/msg05473.html | - |
-| - | https://savannah.gnu.org/bugs/?group=gsl | There are other reposts that can contain bugfixes |
+| - | https://savannah.gnu.org/bugs/?group=gsl | There are other reports that can contain bugfixes |
 | - | https://www.gnu.org/software/gsl/ (Extenions section) | Could be itegrated too? (but this won't be easy) |
 

@@ -8,3 +8,4 @@ gsl
 !gsl/
 gsl.dwarf
 *.dll
+docs/
