@@ -1,4 +1,4 @@
-# This module works with [Simulated Annealing](https://www.gnu.org/software/gsl/doc/html/siman.html)
+# This module implements [Simulated Annealing](https://www.gnu.org/software/gsl/doc/html/siman.html)
 #
 # Note: this module doesn't use GSL function (`gsl_siman_solve`), instead entire algorithm was rewritten in Crystal (it is quite simple)
 module GSL::Siman
@@ -51,6 +51,7 @@ module GSL::Siman
   # Perform simulated annealing algorithm and returns found configuration with minimal energy
   #
   # Parameters have following meaning:
+  #
   # - `initial` defines starting position for search
   # - `params` defines algorithm parameters (see `GSL::Siman::Params`)
   # - if `print_status` is true, current state will be printed to `STDOUT` during search

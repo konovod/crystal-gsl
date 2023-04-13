@@ -3,10 +3,24 @@ require "./find_bracket"
 
 private GSL_SQRT_DBL_EPSILON = 1.4901161193847656e-08
 
+# This module implements [One Dimensional Minimization](https://www.gnu.org/software/gsl/doc/html/min.html)
+#
+# Usage example:
+# ```
+# xm, fm = GSL::Min.find_min(0, 6, 1e-6) do |x|
+#   Math.cos(x)
+# end
+# xm.should be_close Math::PI, 1e-6
+# ```
+#
 module GSL::Min
+  # Minimization algorithm
   enum Type
+    # The golden section algorithm is the simplest method of bracketing the minimum of a function. It is the slowest algorithm provided by the library, with linear convergence.
     GoldenSection
+    # The Brent minimization algorithm combines a parabolic interpolation with the golden section algorithm. This produces a fast algorithm which is still robust.
     Brent
+    # This is a variant of Brent’s algorithm which uses the safeguarded step-length algorithm of Gill and Murray.
     QuadGolden
 
     def to_unsafe
@@ -26,11 +40,14 @@ module GSL::Min
   end
 
   # High-level interface to minimizer. Finds minimum of function f between `x_lower` and `x_upper`.
-  # `eps` - required absolute precision
-  # `algorithm` - minimization algorithm to be used. By default either `Brent` (if `guess` is present) or `QuadGolden` (othrwise) is used.
-  # `max_iter` - maximum number of function evaluations, used to stop iterating when solution doesn't converge
-  # `guess` - initial guess of a root value that can speed up search. If present, f(guess) < f(x_lower) and f(guess) < f(x_upper) should hold.
+  #
+  # - `eps` - required absolute precision
+  # - `algorithm` - minimization algorithm to be used. By default either `Brent` (if `guess` is present) or `QuadGolden` (othrwise) is used.
+  # - `max_iter` - maximum number of function evaluations, used to stop iterating when solution doesn't converge
+  # - `guess` - initial guess of a root value that can speed up search. If present, f(guess) < f(x_lower) and f(guess) < f(x_upper) should hold.
+  #
   # returns nil if number of iterations = max_iter is exceeded
+  #
   # returns {x_min, f_min} tuple if precision = eps achieved
   def self.find_min?(x_lower : Float64, x_upper : Float64, eps : Float64 = 1e-9, *,
                      algorithm : GSL::Min::Type? = nil,
@@ -68,11 +85,14 @@ module GSL::Min
   end
 
   # High-level interface to minimizer. Finds minimum of function f between `x_lower` and `x_upper`.
-  # `eps` - required absolute precision
-  # `algorithm` - minimization algorithm to be used
-  # `max_iter` - maximum number of function evaluations, used to stop iterating when solution doesn't converge
-  # `guess` - initial guess of a root value that can speed up search. If present, f(guess) < f(x_lower) and f(guess) < f(x_upper) should hold.
+  #
+  # - `eps` - required absolute precision
+  # - `algorithm` - minimization algorithm to be used
+  # - `max_iter` - maximum number of function evaluations, used to stop iterating when solution doesn't converge
+  # - `guess` - initial guess of a root value that can speed up search. If present, f(guess) < f(x_lower) and f(guess) < f(x_upper) should hold.
+  #
   # raises IterationsLimitExceeded if number of iterations = max_iter is exceeded
+  #
   # returns {x_min, f_min} tuple if precision = eps achieved
   def self.find_min(x_lower : Float64, x_upper : Float64, eps : Float64,
                     algorithm : GSL::Min::Type? = nil,

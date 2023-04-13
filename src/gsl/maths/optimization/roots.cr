@@ -1,10 +1,34 @@
 require "../../base/*"
 require "./find_bracket"
 
+# This module implements [One Dimensional Root-Finding](https://www.gnu.org/software/gsl/doc/html/roots.html)
+#
+# Usage examples:
+# ```
+# # find root inside a range.
+# xm = GSL::Roots.find_root(0, 3) do |x|
+#   Math.cos(x) - 0.5
+# end
+# xm.should be_close(Math::PI / 3, 1e-9)
+# ```
+#
+# ```
+# # polish root from initial guess. This method requires function and its derivative
+# root = GSL::Roots.polish_root(10, x_possible: (0.0..)) do |x|
+#   f = x*x*x - 125
+#   df = 3*x*x
+#   {f, df}
+# end
+# root.should be_close 5, 1e-9
+# ```
+#
 module GSL::Roots
   enum TypeBracketing
+    # The bisection algorithm is the simplest method of bracketing the roots of a function. It is the slowest algorithm provided by the library, with linear convergence.
     Bisection
+    # The false position algorithm is a method of finding roots based on linear interpolation. Its convergence is linear, but it is usually faster than bisection.
     FalsePosition
+    # The Brent-Dekker method combines an interpolation strategy with the bisection algorithm. This produces a fast algorithm which is still robust.
     BrentDekker
 
     def to_unsafe
@@ -24,8 +48,11 @@ module GSL::Roots
   end
 
   enum TypePolishing
+    # Newton’s Method is the standard root-polishing algorithm.
     Newton
+    # The secant method is a simplified version of Newton’s method which does not require the computation of the derivative on every step.
     Secant
+    # The Steffenson Method provides the fastest convergence of all the routines. It combines the basic Newton algorithm with an Aitken “delta-squared” acceleration.
     Steffenson
 
     def to_unsafe
@@ -45,9 +72,13 @@ module GSL::Roots
   end
 
   # High-level interface to root finder. Finds root of function f between `x_lower` and `x_upper`,
+  #
   # due to nature of used algorithms, signs of function in `x_lower` and `x_upper` must differ
-  # `algorithm` - root bracketing algorithm to be used
+  #
+  # - `algorithm` - root bracketing algorithm to be used
+  #
   # returns nil if number of iterations = `max_iter` is exceeded
+  #
   # returns root value if precision = `eps` achieved
   def self.find_root?(x_lower : Float64, x_upper : Float64, eps : Float64 = 1e-9, *,
                       algorithm : GSL::Roots::TypeBracketing = GSL::Roots::TypeBracketing::BrentDekker,
@@ -68,10 +99,14 @@ module GSL::Roots
     end
   end
 
-  # High-level interface to root finder. Finds root of function f between `x_lower` and `x_upper`,
+  # High-level interface to root finder. Finds root of function f between `x_lower` and `x_upper`
+  #
   # due to nature of used algorithms, signs of function in `x_lower` and `x_upper` must differ
-  # `algorithm` - root bracketing algorithm to be used
+  #
+  # - `algorithm` - root bracketing algorithm to be used
+  #
   # raises IterationsLimitExceeded if number of iterations = `max_iter` is exceeded
+  #
   # returns root value if precision = `eps` achieved
   def self.find_root(x_lower : Float64, x_upper : Float64, eps : Float64 = 1e-9, *,
                      algorithm : GSL::Roots::TypeBracketing = GSL::Roots::TypeBracketing::BrentDekker,
@@ -79,9 +114,12 @@ module GSL::Roots
     find_root?(x_lower, x_upper, eps, algorithm: algorithm, max_iter: max_iter, &f) || raise IterationsLimitExceeded.new("roots bracketing didn't converge")
   end
 
-  # High-level interface to root polishing. Finds root of function f near `initial_guess`,
-  # `algorithm` - root bracketing algorithm to be used
+  # High-level interface to root polishing. Finds root of function f near `initial_guess`
+  #
+  # - `algorithm` - root bracketing algorithm to be used
+  #
   # returns nil if number of iterations = `max_iter` is exceeded or current root estimation is outside `x_possible` range.
+  #
   # returns root value if precision = `eps` achieved
   def self.polish_root?(initial_guess : Float64, eps : Float64 = 1e-9, *,
                         x_possible : Range(Float64?, Float64?)? = nil,
@@ -109,9 +147,12 @@ module GSL::Roots
     end
   end
 
-  # High-level interface to root polishing. Finds root of function f near `initial_guess`,
-  # `algorithm` - root bracketing algorithm to be used
+  # High-level interface to root polishing. Finds root of function f near `initial_guess`
+  #
+  # - `algorithm` - root bracketing algorithm to be used
+  #
   # raises IterationsLimitExceeded if number of iterations = `max_iter` is exceeded or current root estimation is outside `x_possible` range.
+  #
   # returns root value if precision = `eps` achieved
   def self.polish_root(initial_guess : Float64, eps : Float64 = 1e-9, *,
                        x_possible : Range(Float64?, Float64?)? = nil,

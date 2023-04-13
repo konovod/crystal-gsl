@@ -1,11 +1,10 @@
-# this is a Crystal translation of gsl/min/bracketing.c
-# with patch proposed in http://savannah.gnu.org/bugs/?45053
-
 # TODO - move somewhere?
 private GOLDEN               =              0.3819660
 private GSL_SQRT_DBL_EPSILON = 1.4901161193847656e-08
 
 module GSL::Min
+  # this is a Crystal translation of gsl/min/bracketing.c
+  # with patch proposed in http://savannah.gnu.org/bugs/?45053
   def self.min_find_bracket(f : GSL::Function, x_minimum : LibC::Double*, f_minimum : LibC::Double*, x_lower : LibC::Double*, f_lower : LibC::Double*, x_upper : LibC::Double*, f_upper : LibC::Double*, eval_max : Int32) : LibGSL::Code
     f_left = f_lower.value
     f_right = f_upper.value
