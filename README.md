@@ -17,6 +17,8 @@ dependencies:
     github: konovod/crystal-gsl
 ```
 
+Run `shards install`
+
 ## System dependencies
 
 ### Ubuntu

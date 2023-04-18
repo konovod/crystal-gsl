@@ -1,5 +1,7 @@
 # current
 
+* use SimplePool for thread safety
+
 # 0.2
 
 * Changed license to GPL3

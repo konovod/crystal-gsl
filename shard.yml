@@ -6,4 +6,8 @@ authors:
   - Dylandy Chang <dylandy.chang@googlemail.com>
   - Andrey Konovod <konovod@gmail.com>
 
-license: MIT
+dependencies:
+  simplepool:
+    github: konovod/simplepool
+
+license: GPLv3

@@ -9,3 +9,5 @@ gsl
 gsl.dwarf
 *.dll
 docs/
+.shards/
+lib/
