@@ -39,4 +39,5 @@ jobs:
       - name: copy GSL libraries
         run: |
           echo "LIB=$(pwd)\gsl/lib/x64/Debug;${env:LIB}" >>${env:GITHUB_ENV}
+      - run: shards install
       - run: crystal spec
