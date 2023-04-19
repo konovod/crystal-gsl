@@ -32,7 +32,7 @@ Status of GSL areas (list taken from [GSL docs](https://www.gnu.org/software/gsl
 | Interpolation | Done |  |
 | Numerical Differentiation | Done |  |
 | Chebyshev Approximations | Done |  |
-| Series Acceleration | - |  |
+| Series Acceleration | Done |  |
 | Wavelet Transforms | - |  |
 | Discrete Hankel Transforms | - | I dont' understand what is it |
 | One Dimensional Root-Finding | Done |  |

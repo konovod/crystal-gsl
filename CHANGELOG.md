@@ -1,5 +1,6 @@
 # current
 
+* Support for Series Acceleration
 * use SimplePool for thread safety
 
 # 0.2
