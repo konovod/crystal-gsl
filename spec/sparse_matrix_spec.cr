@@ -99,4 +99,21 @@ describe GSL::SparseMatrix do
       sp2[1, 1].should eq 1
     end
   end
+
+  describe "#convert" do
+    it "should convert matrix to given type" do
+      sp1 = GSL::SparseMatrix.new 7, 3, :coo
+      sp1[1, 2] = 3
+      sp2 = sp1.convert(:csr)
+      sp2.type.should eq GSL::SparseMatrix::Type::CSR
+      sp2[1, 2].should eq 3
+    end
+    it "should return clone when type isn't changed" do
+      sp1 = GSL::SparseMatrix.new 7, 3, :coo
+      sp1[1, 2] = 3
+      sp2 = sp1.convert(:coo)
+      sp2.type.should eq GSL::SparseMatrix::Type::COO
+      sp2[1, 2].should eq 3
+    end
+  end
 end
