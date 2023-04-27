@@ -70,4 +70,33 @@ describe GSL::SparseMatrix do
       temp.minmax.should eq [0, 0]
     end
   end
+
+  describe ".new" do
+    it "should create empty COO matrix" do
+      sp = GSL::SparseMatrix.new 5, 5
+      sp.type.should eq GSL::SparseMatrix::Type::COO
+    end
+    it "should create sparse matrix of given type" do
+      sp = GSL::SparseMatrix.new 5, 5, :csr
+      sp.type.should eq GSL::SparseMatrix::Type::CSR
+    end
+
+    it "should create copy of matrix" do
+      sp1 = GSL::SparseMatrix.new 7, 3
+      sp1[1, 1] = 1
+      sp2 = GSL::SparseMatrix.new sp1
+      sp2.type.should eq GSL::SparseMatrix::Type::COO
+      sp2.should eq sp1
+      sp1[1, 1] = 5
+      sp2[1, 1].should eq 1
+    end
+
+    it "should create copy of matrix with given type" do
+      sp1 = GSL::SparseMatrix.new 7, 3
+      sp1[1, 1] = 1
+      sp2 = GSL::SparseMatrix.new sp1, :csr
+      sp2.type.should eq GSL::SparseMatrix::Type::CSR
+      sp2[1, 1].should eq 1
+    end
+  end
 end
