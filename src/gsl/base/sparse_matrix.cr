@@ -143,6 +143,10 @@ module GSL
     def to_dense
       DenseMatrix.new(self)
     end
+
+    def norm1
+      LibGSL.gsl_spmatrix_norm1(self)
+    end
   end
 
   class DenseMatrix < Matrix

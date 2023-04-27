@@ -155,4 +155,16 @@ describe GSL::SparseMatrix do
       sp1[1, 1].should eq 0
     end
   end
+
+  describe "#norm1" do
+    it "returns zero for empty matrix" do
+      test_matrix.norm1.should eq 0
+    end
+    it "returns norm1 value" do
+      sp1 = GSL::SparseMatrix.new 7, 3
+      sp1[1, 2] = -3
+      sp1[2, 2] = 2
+      sp1.norm1.should eq 5
+    end
+  end
 end
