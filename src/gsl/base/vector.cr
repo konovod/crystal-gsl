@@ -177,10 +177,14 @@ module GSL
       self
     end
 
-    def copy
+    def clone
       temp = GSL::Vector.new self.size
       LibGSL.gsl_vector_memcpy(temp.pointer, self.pointer)
       temp
+    end
+
+    def copy
+      clone
     end
 
     # return a new vector with reversed elements of current vector

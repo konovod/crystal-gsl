@@ -2,16 +2,16 @@ module GSL
   abstract class Matrix
     getter pointer
 
-    def nrows : LibC::SizeT
-      @pointer.value.size1
+    def nrows : Int32
+      Int32.new @pointer.value.size1
     end
 
-    def ncols : LibC::SizeT
-      @pointer.value.size2
+    def ncols : Int32
+      Int32.new @pointer.value.size2
     end
 
     def shape
-      Tuple.new(@rows, @columns)
+      Tuple.new(nrows, ncols)
     end
 
     def [](row : Symbol | Int32, column : Symbol | Int32) : Vector
@@ -29,7 +29,11 @@ module GSL
     abstract def get(row, column) : Float64
     abstract def set(row, column, x)
     abstract def set_zero
-    abstract def copy : Matrix
+    abstract def clone : self
+
+    def copy
+      clone
+    end
 
     abstract def [](row : Int32, column : Int32) : Float64
 
@@ -54,8 +58,8 @@ module GSL
   class DenseMatrix < Matrix
     getter pointer
 
-    def initialize(@rows : Int32, @columns : Int32)
-      @pointer = LibGSL.gsl_matrix_calloc(@rows, @columns)
+    def initialize(nrows : Int32, ncols : Int32)
+      @pointer = LibGSL.gsl_matrix_calloc(nrows, ncols)
     end
 
     def to_unsafe
@@ -75,7 +79,7 @@ module GSL
     end
 
     def row(r : Int32 | Symbol) : Vector
-      result = Vector.new @columns
+      result = Vector.new ncols
       LibGSL.gsl_matrix_get_row(result.pointer, @pointer, r.to_i)
       return result
     end
@@ -85,17 +89,17 @@ module GSL
     end
 
     def column(c : Int32 | Symbol) : Vector
-      result = Vector.new @rows
+      result = Vector.new nrows
       LibGSL.gsl_matrix_get_col(result.pointer, @pointer, c.to_i)
       return result
     end
 
     def []=(row : Symbol | Int32, column : Symbol | Int32, x : Int32 | Float64)
       if row == :all
-        (0...@rows).each { |n| LibGSL.gsl_matrix_set(@pointer, n, column.to_i, x) }
+        (0...nrows).each { |n| LibGSL.gsl_matrix_set(@pointer, n, column.to_i, x) }
         self[:all, column]
       elsif column == :all
-        (0...@columns).each { |n| LibGSL.gsl_matrix_set(@pointer, row.to_i, n, x) }
+        (0...ncols).each { |n| LibGSL.gsl_matrix_set(@pointer, row.to_i, n, x) }
         self[row, :all]
       else
         LibGSL.gsl_matrix_set(@pointer, row.to_i, column.to_i, x.to_f)
@@ -105,10 +109,10 @@ module GSL
 
     def []=(row : Symbol | Int32, column : Symbol | Int32, x : Vector)
       if row == :all
-        (0...@rows).each { |n| LibGSL.gsl_matrix_set(@pointer, n, column.to_i, x[n]) }
+        (0...nrows).each { |n| LibGSL.gsl_matrix_set(@pointer, n, column.to_i, x[n]) }
         self[:all, column]
       elsif column == :all
-        (0...@columns).each { |n| LibGSL.gsl_matrix_set(@pointer, row.to_i, n, x[n]) }
+        (0...ncols).each { |n| LibGSL.gsl_matrix_set(@pointer, row.to_i, n, x[n]) }
         self[row, :all]
       end
     end
@@ -128,11 +132,11 @@ module GSL
     end
 
     def like : DenseMatrix
-      return DenseMatrix.new @rows, @columns
+      return DenseMatrix.new nrows, ncols
     end
 
-    def copy : GSL::DenseMatrix
-      result = DenseMatrix.new @rows, @columns
+    def clone : GSL::DenseMatrix
+      result = DenseMatrix.new nrows, ncols
       LibGSL.gsl_matrix_memcpy(result.pointer, @pointer)
       return result
     end

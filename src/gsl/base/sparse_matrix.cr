@@ -1,9 +1,32 @@
 module GSL
   class SparseMatrix < Matrix
+    enum Type
+      COO = 0 # coordinate/triplet representation
+      CSC = 1 # compressed sparse column
+      CSR = 2 # compressed sparse row
+    end
+
     getter pointer
 
-    def initialize(@rows : Int32, @columns : Int32)
-      @pointer = LibGSL.gsl_spmatrix_alloc(@rows, @columns)
+    def type
+      Type.new(pointer.value.sptype)
+    end
+
+    def initialize(nrows : Int32, ncols : Int32)
+      @pointer = LibGSL.gsl_spmatrix_alloc(nrows, ncols)
+    end
+
+    def initialize(nrows : Int32, ncols : Int32, type : Type, non_zero = nrows * ncols / 10)
+      @pointer = LibGSL.gsl_spmatrix_alloc_nzmax(nrows, ncols, non_zero, type)
+    end
+
+    def initialize(another : SparseMatrix, type : Type = another.type)
+      if type == another.type
+        @pointer = LibGSL.gsl_spmatrix_alloc_nzmax(another.nrows, another.ncols, another.non_zero, type)
+        LibGSL.gsl_spmatrix_memcpy(@pointer, another.pointer)
+      else
+        @pointer = LibGSL.gsl_spmatrix_compress(another.pointer, type)
+      end
     end
 
     def get(row, column) : Float64
@@ -20,10 +43,10 @@ module GSL
 
     def []=(row : Symbol | Int32, column : Symbol | Int32, x : Int32 | Float64)
       if row == :all
-        (0...@rows).each { |n| self.set(n, column.to_i, x) }
+        (0...nrows).each { |n| self.set(n, column.to_i, x) }
         self[:all, column]
       elsif column == :all
-        (0...@columns).each { |n| self.set(row.to_i, n, x) }
+        (0...ncols).each { |n| self.set(row.to_i, n, x) }
         self[row, :all]
       else
         self.set(row.to_i, column.to_i, x.to_f)
@@ -36,16 +59,16 @@ module GSL
     end
 
     def column(c : Int32 | Symbol) : Vector
-      result = Vector.new @rows
-      (0...@rows).each { |r|
+      result = Vector.new nrows
+      (0...nrows).each { |r|
         result[r] = self.get(r, c)
       }
       return result
     end
 
     def row(r : Int32 | Symbol) : Vector
-      result = Vector.new @columns
-      (0...@columns).each { |c|
+      result = Vector.new ncols
+      (0...ncols).each { |c|
         result[c] = self.get(r, c)
       }
       return result
@@ -57,21 +80,29 @@ module GSL
     end
 
     def like : SparseMatrix
-      return SparseMatrix.new @rows, @columns
+      return SparseMatrix.new nrows, ncols, type, non_zero
     end
 
-    def copy : SparseMatrix
-      result = SparseMatrix.new @rows, @columns
-      LibGSL.gsl_spmatrix_memcpy(result.pointer, @pointer)
-      return result
+    def clone : SparseMatrix
+      SparseMatrix.new(self)
     end
 
     def non_zero : Int32
       Int32.new(LibGSL.gsl_spmatrix_nnz(@pointer))
     end
 
-    def finalize
+    def free
+      return if @pointer.null?
       LibGSL.gsl_spmatrix_free(@pointer)
+      @pointer = Pointer(LibGSL::Gsl_spmatrix).null
+    end
+
+    def finalize
+      free
+    end
+
+    def convert(type : Type)
+      SparseMatrix.new(self, type)
     end
 
     def minmax
