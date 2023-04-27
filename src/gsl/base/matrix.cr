@@ -149,12 +149,14 @@ module GSL
       return matrix
     end
 
-    def self.free(m : DenseMatrix)
-      LibGSL.gsl_matrix_free(m)
+    def free
+      return if @pointer.null?
+      LibGSL.gsl_matrix_free(@pointer)
+      @pointer = Pointer(LibGSL::Gsl_matrix).null
     end
 
     def finalize
-      LibGSL.gsl_matrix_free(self)
+      free
     end
 
     def set_all(n : Float64 | Int32)
