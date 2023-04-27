@@ -58,10 +58,6 @@ module GSL
       return transpose
     end
 
-    def t : DenseMatrix
-      return self.transpose
-    end
-
     def inverse : DenseMatrix
       temp = self.copy
       p = GSL::Permutation.new Array.new(self.shape[0], 0)
@@ -75,24 +71,6 @@ module GSL
     # alias to inverse
     def i : DenseMatrix
       self.inverse
-    end
-  end
-
-  class SparseMatrix < Matrix
-    def transpose : SparseMatrix
-      transpose = SparseMatrix.new self.shape[1].to_i, self.shape[0].to_i
-      LibGSL.gsl_spmatrix_transpose_memcpy(transpose.pointer, self.pointer)
-      return transpose
-    end
-
-    def t : SparseMatrix
-      return self.transpose
-    end
-
-    def *(n : Int32 | Float64) : SparseMatrix
-      temp = self.copy
-      LibGSL.gsl_spmatrix_scale(temp.pointer, n.to_f)
-      temp
     end
   end
 end
