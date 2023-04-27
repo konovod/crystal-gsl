@@ -27,6 +27,18 @@ module GSL
       end
     end
 
+    def initialize(another : DenseMatrix, type : Type = Type::COO)
+      if type.coo?
+        @pointer = LibGSL.gsl_spmatrix_alloc(another.nrows, another.ncols)
+        LibGSL.gsl_spmatrix_d2sp(@pointer, another)
+      else
+        temp = LibGSL.gsl_spmatrix_alloc(another.nrows, another.ncols)
+        LibGSL.gsl_spmatrix_d2sp(temp, another)
+        @pointer = LibGSL.gsl_spmatrix_compress(temp, type)
+        LibGSL.gsl_spmatrix_free(temp)
+      end
+    end
+
     def get(row, column) : Float64
       return LibGSL.gsl_spmatrix_get(self, row.to_i, column.to_i)
     end
@@ -126,6 +138,21 @@ module GSL
       temp = self.copy
       LibGSL.gsl_spmatrix_scale(temp, n.to_f)
       temp
+    end
+
+    def to_dense
+      DenseMatrix.new(self)
+    end
+  end
+
+  class DenseMatrix < Matrix
+    def to_sparse(typ = SparseMatrix::Type::COO)
+      SparseMatrix.new(self, typ)
+    end
+
+    def initialize(another : SparseMatrix)
+      @pointer = LibGSL.gsl_matrix_calloc(another.nrows, another.ncols)
+      LibGSL.gsl_spmatrix_sp2d(@pointer, another)
     end
   end
 end

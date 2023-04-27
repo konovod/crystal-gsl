@@ -98,6 +98,14 @@ describe GSL::SparseMatrix do
       sp2.type.should eq GSL::SparseMatrix::Type::CSR
       sp2[1, 1].should eq 1
     end
+
+    it "should create sparse matrix from dense matrix" do
+      sp1 = GSL::DenseMatrix.new 7, 3
+      sp1[1, 1] = 1
+      sp2 = GSL::SparseMatrix.new sp1, :csr
+      sp2.type.should eq GSL::SparseMatrix::Type::CSR
+      sp2[1, 1].should eq 1
+    end
   end
 
   describe "#convert" do
@@ -135,6 +143,16 @@ describe GSL::SparseMatrix do
       sp1.transpose!
       sp1.shape.should eq({3, 7})
       sp1[2, 1].should eq 3
+    end
+  end
+
+  describe "#to_dense" do
+    it "returns dense matrix with same elements" do
+      sp1 = GSL::SparseMatrix.new 7, 3
+      sp1[1, 2] = 3
+      sp2 = sp1.to_dense
+      sp2[1, 2].should eq 3
+      sp1[1, 1].should eq 0
     end
   end
 end
