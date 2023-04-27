@@ -63,11 +63,11 @@ describe GSL::SparseMatrix do
     it "should return the minimum and maximun value of the matrix" do
       temp = test_matrix.like
       temp[0, 0] = 1
-      temp.minmax.should eq [0, 1]
+      temp.minmax.should eq({0, 1})
     end
     it "should return 0 value for empty matrix" do
       temp = test_matrix.like
-      temp.minmax.should eq [0, 0]
+      temp.minmax.should eq({0, 0})
     end
   end
 

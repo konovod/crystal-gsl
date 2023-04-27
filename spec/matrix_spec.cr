@@ -68,21 +68,21 @@ describe GSL::DenseMatrix do
     it "should return the minimum and maximun value of the matrix" do
       temp = test_matrix.copy
       temp[0, 0] = 1
-      temp.minmax.should eq [0, 1]
+      temp.minmax.should eq({0, 1})
     end
   end
   describe "#max_index" do
     it "should return the index of the maximum value" do
       temp = test_matrix.copy
       temp[0, 0] = 1
-      temp.max_index.should eq [0, 0]
+      temp.max_index.should eq({0, 0})
     end
   end
   describe "#min_index" do
     it "should return the index of the minimum value" do
       temp = test_matrix.copy
       temp[0, 0] = 1
-      temp.min_index.should eq [0, 1]
+      temp.min_index.should eq({0, 1})
     end
   end
   describe "#empty?" do

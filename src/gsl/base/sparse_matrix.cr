@@ -6,8 +6,6 @@ module GSL
       CSR = 2 # compressed sparse row
     end
 
-    getter pointer
-
     def type
       Type.new(pointer.value.sptype)
     end
@@ -23,18 +21,18 @@ module GSL
     def initialize(another : SparseMatrix, type : Type = another.type)
       if type == another.type
         @pointer = LibGSL.gsl_spmatrix_alloc_nzmax(another.nrows, another.ncols, another.non_zero, type)
-        LibGSL.gsl_spmatrix_memcpy(@pointer, another.pointer)
+        LibGSL.gsl_spmatrix_memcpy(@pointer, another)
       else
-        @pointer = LibGSL.gsl_spmatrix_compress(another.pointer, type)
+        @pointer = LibGSL.gsl_spmatrix_compress(another, type)
       end
     end
 
     def get(row, column) : Float64
-      return LibGSL.gsl_spmatrix_get(@pointer, row.to_i, column.to_i)
+      return LibGSL.gsl_spmatrix_get(self, row.to_i, column.to_i)
     end
 
     def set(row, column, x)
-      return LibGSL.gsl_spmatrix_set(@pointer, row, column, x)
+      return LibGSL.gsl_spmatrix_set(self, row, column, x)
     end
 
     def [](row : Int32, column : Int32) : Float64
@@ -55,7 +53,7 @@ module GSL
     end
 
     def ==(m : GSL::SparseMatrix)
-      LibGSL.gsl_spmatrix_equal(@pointer, m.pointer) == 1 ? true : false
+      LibGSL.gsl_spmatrix_equal(self, m) == 1 ? true : false
     end
 
     def column(c : Int32 | Symbol) : Vector
@@ -75,7 +73,7 @@ module GSL
     end
 
     def set_zero
-      LibGSL.gsl_spmatrix_set_zero(@pointer)
+      LibGSL.gsl_spmatrix_set_zero(self)
       self
     end
 
@@ -88,7 +86,7 @@ module GSL
     end
 
     def non_zero : Int32
-      Int32.new(LibGSL.gsl_spmatrix_nnz(@pointer))
+      Int32.new(LibGSL.gsl_spmatrix_nnz(self))
     end
 
     def free
@@ -106,27 +104,27 @@ module GSL
     end
 
     def minmax
-      return [0.0, 0.0] if non_zero == 0
-      LibGSL.gsl_spmatrix_minmax(@pointer, out min, out max)
+      return {0.0, 0.0} if non_zero == 0
+      LibGSL.gsl_spmatrix_minmax(self, out min, out max)
       min = 0.0 if min > 0.0
       max = 0.0 if max < 0.0
-      return [min, max]
+      return min, max
     end
 
     def transpose : SparseMatrix
-      transpose = SparseMatrix.new self.shape[1].to_i, self.shape[0].to_i
-      LibGSL.gsl_spmatrix_transpose_memcpy(transpose.pointer, self.pointer)
+      transpose = SparseMatrix.new self.shape[1].to_i, self.shape[0].to_i, type, non_zero
+      LibGSL.gsl_spmatrix_transpose_memcpy(transpose, self)
       return transpose
     end
 
     def transpose!
-      LibGSL.gsl_spmatrix_transpose(@pointer)
+      LibGSL.gsl_spmatrix_transpose(self)
       self
     end
 
     def *(n : Int32 | Float64) : SparseMatrix
       temp = self.copy
-      LibGSL.gsl_spmatrix_scale(temp.pointer, n.to_f)
+      LibGSL.gsl_spmatrix_scale(temp, n.to_f)
       temp
     end
   end
