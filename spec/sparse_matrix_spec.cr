@@ -116,4 +116,25 @@ describe GSL::SparseMatrix do
       sp2[1, 2].should eq 3
     end
   end
+
+  describe "#transpose" do
+    it "should return transpose" do
+      sp1 = GSL::SparseMatrix.new 7, 3
+      sp1[1, 2] = 3
+      sp2 = sp1.transpose
+      sp2.type.should eq sp1.type
+      sp2.shape.should eq({3, 7})
+      sp2[2, 1].should eq 3
+    end
+  end
+  describe "#transpose!" do
+    it "should transpose inplace" do
+      sp1 = GSL::SparseMatrix.new 7, 3
+      sp1[1, 2] = 3
+      sp1 = sp1.convert(:csr)
+      sp1.transpose!
+      sp1.shape.should eq({3, 7})
+      sp1[2, 1].should eq 3
+    end
+  end
 end

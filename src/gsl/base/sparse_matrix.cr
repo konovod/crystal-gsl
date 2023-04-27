@@ -119,6 +119,11 @@ module GSL
       return transpose
     end
 
+    def transpose!
+      LibGSL.gsl_spmatrix_transpose(@pointer)
+      self
+    end
+
     def *(n : Int32 | Float64) : SparseMatrix
       temp = self.copy
       LibGSL.gsl_spmatrix_scale(temp.pointer, n.to_f)
