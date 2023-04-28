@@ -259,6 +259,42 @@ describe GSL::SparseMatrix do
       expect_raises(Exception) { a*b }
     end
   end
+
+  describe ".solve" do
+    it "should solve example from gsl docs" do
+      n = 100         #  number of grid points
+      size = n - 2    # subtract 2 to exclude boundaries
+      h = 1 / (n - 1) # grid spacing
+      a = GSL::SparseMatrix.new(size, size)
+      f = GSL::Vector.new(size)
+      # construct the sparse matrix for the finite difference equation
+      # construct first row
+      a[0, 0] = -2
+      a[0, 1] = 1
+      # construct rows [1:n-2]
+      (1...size - 1).each do |i|
+        a[i, i + 1] = 1
+        a[i, i] = -2
+        a[i, i - 1] = 1
+      end
+      # construct last row
+      a[size - 1, size - 1] = -2
+      a[size - 1, size - 2] = 1
+      # scale by h^2
+      a = a*h
+      # construct right hand side vector
+      size.times do |i|
+        xi = (i + 1) * h
+        fi = -Math::PI * Math::PI * Math.sin(Math::PI * xi)
+        f[i] = fi
+      end
+      # convert to compressed column format
+      c = a.convert(:csc)
+      # now solve the system with the GMRES iterative solver
+      u = GSL::SparseMatrix.solve(a, f)
+      pp u.to_a
+    end
+  end
 end
 
 describe GSL::DenseMatrix do

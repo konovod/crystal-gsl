@@ -25,6 +25,7 @@ module GSL
       begin
         max_iterations.times do
           status = LibGSL::Code.new(LibGSL.gsl_splinalg_itersolve_iterate(a, b, eps, guess, workspace))
+          p status, LibGSL.gsl_splinalg_itersolve_normr(workspace), guess.pointer.value.data.value
           return guess if status.gsl_success?
         end
         norm = LibGSL.gsl_splinalg_itersolve_normr(workspace)
