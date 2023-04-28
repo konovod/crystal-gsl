@@ -1,8 +1,9 @@
 # current
 
-* updated SparseMatrix to wrap all gsl functions
 * Support for Series Acceleration
 * use SimplePool for thread safety
+* updated SparseMatrix to wrap all gsl functions
+* Support for Sparse BLAS
 
 # 0.2
 

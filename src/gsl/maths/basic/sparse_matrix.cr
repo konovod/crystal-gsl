@@ -8,11 +8,11 @@ module GSL
     end
 
     def *(m : SparseMatrix)
-      raise ArgumentError.new("Format of first matrix must be compressed") if type.coo?
-      raise ArgumentError.new("Format of second matrix must be compressed") if m.type.coo?
+      raise ArgumentError.new("Format of first matrix must be CSC") unless type.csc?
+      raise ArgumentError.new("Format of second matrix must be CSC") unless m.type.csc?
       raise ArgumentError.new("dimensions do not match - #{ncols} != #{m.nrows}") unless ncols == m.nrows
       result = SparseMatrix.new(nrows, m.ncols, type)
-      LibGSL.gsl_blas_dgemm(1.0, self, m, temp)
+      LibGSL.gsl_spblas_dgemm(1.0, self, m, result)
       result
     end
 

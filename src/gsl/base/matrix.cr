@@ -220,5 +220,9 @@ module GSL
     def tail
       self.nrows >= 5 ? puts ((self.nrows - 5).to_i...self.nrows.to_i).map { |x| self[x, :all].inspect }.join("\n") : puts self.inspect
     end
+
+    def norm1
+      LibGSL.gsl_matrix_norm1(self)
+    end
   end
 end

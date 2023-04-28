@@ -228,6 +228,37 @@ describe GSL::SparseMatrix do
       a.min_index.should eq({1, 2})
     end
   end
+
+  describe "#*" do
+    it "can multiply to sparse matrix" do
+      a = GSL::DenseMatrix.eye 5
+      a[0, 2] = -3
+      a[2, 0] = 3
+      sa = a.to_sparse(GSL::SparseMatrix::Type::CSC)
+      sb = a.i.to_sparse(GSL::SparseMatrix::Type::CSC)
+      ((sa*sb).to_dense - GSL::DenseMatrix.eye(5)).norm1.should be < 1e-9
+    end
+
+    it "should raise when dimension of matrices do not match" do
+      a = GSL::SparseMatrix.new 3, 4, GSL::SparseMatrix::Type::CSC
+      b = GSL::SparseMatrix.new 3, 4, GSL::SparseMatrix::Type::CSC
+      expect_raises(Exception) { a*b }
+    end
+
+    it "can multiply to vector" do
+      a = GSL::SparseMatrix.new 4, 3
+      a[1, 2] = -1
+      a[2, 0] = -1
+      b = GSL::Vector.new [10.0, 20.0, 30.0]
+      (a*b).to_a.should eq [0, -30, -10, 0]
+    end
+
+    it "should raise when dimension of vector do not match" do
+      a = GSL::SparseMatrix.new 3, 4
+      b = GSL::Vector.new [10.0, 20.0, 30.0]
+      expect_raises(Exception) { a*b }
+    end
+  end
 end
 
 describe GSL::DenseMatrix do

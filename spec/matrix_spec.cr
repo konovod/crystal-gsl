@@ -202,6 +202,17 @@ describe GSL::DenseMatrix do
       temp.shape.should eq({5, 5})
     end
   end
+  describe "#norm1" do
+    it "returns zero for empty matrix" do
+      test_matrix.norm1.should eq 0
+    end
+    it "returns norm1 value" do
+      m = GSL::DenseMatrix.new 7, 3
+      m[1, 2] = -3
+      m[2, 2] = 2
+      m.norm1.should eq 5
+    end
+  end
   describe "#inverse" do
     it "should return the inverse of the input matrix" do
       tester = [
