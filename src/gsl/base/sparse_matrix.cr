@@ -147,6 +147,23 @@ module GSL
     def norm1
       LibGSL.gsl_spmatrix_norm1(self)
     end
+
+    def scale_columns!(v)
+      raise ArgumentError.new("dimensions do not match: #{ncols} != #{v.size}") unless ncols == v.size
+      v = Vector.new(v) unless v.is_a? Vector
+      LibGSL.gsl_spmatrix_scale_columns(self, v)
+    end
+
+    def scale_rows!(v)
+      raise ArgumentError.new("dimensions do not match: #{nrows} != #{v.size}") unless nrows == v.size
+      v = Vector.new(v) unless v.is_a? Vector
+      LibGSL.gsl_spmatrix_scale_rows(self, v)
+    end
+
+    def min_index
+      LibGSL.gsl_spmatrix_min_index(self, out row, out column)
+      return row, column
+    end
   end
 
   class DenseMatrix < Matrix
@@ -157,6 +174,16 @@ module GSL
     def initialize(another : SparseMatrix)
       @pointer = LibGSL.gsl_matrix_calloc(another.nrows, another.ncols)
       LibGSL.gsl_spmatrix_sp2d(@pointer, another)
+    end
+
+    def add!(another : SparseMatrix)
+      raise ArgumentError.new("dimensions do not match: #{self.shape} != #{another.shape}") unless self.shape == another.shape
+      LibGSL.gsl_spmatrix_dense_add(self, another)
+    end
+
+    def sub!(another : SparseMatrix)
+      raise ArgumentError.new("dimensions do not match: #{self.shape} != #{another.shape}") unless self.shape == another.shape
+      LibGSL.gsl_spmatrix_dense_sub(self, another)
     end
   end
 end

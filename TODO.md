@@ -42,7 +42,7 @@ Status of GSL areas (list taken from [GSL docs](https://www.gnu.org/software/gsl
 | Linear Least-Squares Fitting | - |  |
 | Nonlinear Least-Squares Fitting | - |  |
 | Basis Splines | Partially Done | 2.7 API done, but they were significantly overhauled in 2.8 |
-| Sparse Matrices | Partially done |  |
+| Sparse Matrices | Done |  |
 | Sparse BLAS Support | - | Maybe there are better alternatives, but none for Crystal atm |
 | Sparse Linear Algebra | - | Maybe there are better alternatives, but none for Crystal atm |
 | Physical Constants | Done |  |

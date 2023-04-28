@@ -167,4 +167,107 @@ describe GSL::SparseMatrix do
       sp1.norm1.should eq 5
     end
   end
+
+  describe "#scale_columns" do
+    it "scale columns by vector" do
+      a = GSL::SparseMatrix.new 4, 3
+      a[2, 0] = -3
+      a[3, 1] = 2
+      a.scale_columns! GSL::Vector.new [10.0, 20.0, 30.0]
+      a[2, 0].should eq -30
+      a[3, 1].should eq 40
+    end
+    it "scale columns by array" do
+      a = GSL::SparseMatrix.new 4, 3
+      a[2, 0] = -3
+      a[3, 1] = 2
+      a.scale_columns!([10.0, 20.0, 30.0])
+      a[2, 0].should eq -30
+      a[3, 1].should eq 40
+    end
+    it "should raise if dimensions don't match" do
+      a = GSL::SparseMatrix.new 4, 3
+      expect_raises(Exception) { a.scale_columns!([1.0, 2.0, 3.0, 4.0]) }
+    end
+  end
+
+  describe "#scale_rows" do
+    it "scale rows by vector" do
+      a = GSL::SparseMatrix.new 4, 3
+      a[0, 2] = -3
+      a[1, 2] = 2
+      a.scale_rows! GSL::Vector.new [10.0, 20.0, 30.0, 40.0]
+      a[0, 2].should eq -30
+      a[1, 2].should eq 40
+    end
+    it "scale rows by array" do
+      a = GSL::SparseMatrix.new 4, 3
+      a[0, 2] = -3
+      a[1, 2] = 2
+      a.scale_rows!([10.0, 20.0, 30.0, 40.0])
+      a[0, 2].should eq -30
+      a[1, 2].should eq 40
+    end
+    it "should raise if dimensions don't match" do
+      a = GSL::SparseMatrix.new 7, 3
+      expect_raises(Exception) { a.scale_rows!([4.0, 5.0, 6.0]) }
+    end
+  end
+
+  describe "#min_index" do
+    it "should find minimal element" do
+      a = GSL::SparseMatrix.new 4, 3
+      a[0, 2] = -3
+      a[1, 2] = 2
+      a.min_index.should eq({0, 2})
+    end
+    it "should find minimal element when all elements are positive" do
+      a = GSL::SparseMatrix.new 4, 3
+      a[0, 2] = 3
+      a[1, 2] = 0
+      a.min_index.should eq({1, 2})
+    end
+  end
+end
+
+describe GSL::DenseMatrix do
+  describe "#add!" do
+    it "should add! sparse matrix to dense" do
+      a = GSL::DenseMatrix.new 5, 5
+      a[1, 2] = 3
+      a[2, 3] = 4
+      b = GSL::SparseMatrix.new 5, 5
+      b[1, 2] = -3
+      b[3, 2] = -4
+
+      a.add! b
+      a[1, 2].should eq 0
+      a[2, 3].should eq 4
+      a[3, 2].should eq -4
+    end
+    it "should raise if dimensions don't match" do
+      a = GSL::DenseMatrix.new 5, 4
+      expect_raises(Exception) { a.add!(GSL::SparseMatrix.new(4, 5)) }
+    end
+  end
+
+  describe "#sub!" do
+    it "should sub! sparse matrix from dense" do
+      a = GSL::DenseMatrix.new 5, 5
+      a[1, 2] = 3
+      a[2, 3] = 4
+      b = GSL::SparseMatrix.new 5, 5
+      b[1, 2] = 3
+      b[3, 2] = 4
+
+      a.sub! b
+      a[1, 2].should eq 0
+      a[2, 3].should eq 4
+      a[3, 2].should eq -4
+    end
+    it "should raise if dimensions don't match" do
+      a = GSL::DenseMatrix.new 5, 4
+      expect_raises(Exception) { a.sub!(GSL::SparseMatrix.new(4, 5)) }
+    end
+  end
 end
