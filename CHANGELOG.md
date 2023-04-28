@@ -4,6 +4,7 @@
 * use SimplePool for thread safety
 * updated SparseMatrix to wrap all gsl functions
 * Support for Sparse BLAS
+* Support for Sparse Linear Algebra
 
 # 0.2
 

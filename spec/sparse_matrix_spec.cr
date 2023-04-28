@@ -281,7 +281,7 @@ describe GSL::SparseMatrix do
       a[size - 1, size - 1] = -2
       a[size - 1, size - 2] = 1
       # scale by h^2
-      a = a*h
+      a = a*(1/h/h)
       # construct right hand side vector
       size.times do |i|
         xi = (i + 1) * h
@@ -292,7 +292,12 @@ describe GSL::SparseMatrix do
       c = a.convert(:csc)
       # now solve the system with the GMRES iterative solver
       u = GSL::SparseMatrix.solve(a, f)
-      pp u.to_a
+      # compare with exact solution
+      size.times do |i|
+        xi = (i + 1)*h
+        exact = Math.sin(Math::PI*xi)
+        u[i].should be_close exact, 1e-3
+      end
     end
   end
 end
