@@ -86,47 +86,36 @@ module GSL::ODE
     end
   end
 
-  class Driver
-    @raw : Pointer(LibGSL::Gsl_odeiv2_driver)
+  class Driver < GSL::Object
+    @pointer : Pointer(LibGSL::Gsl_odeiv2_driver)
     getter system : System
 
     # low level API
 
-    def to_unsafe
-      @raw
+    def lib_free
+      LibGSL.gsl_odeiv2_driver_free(@pointer)
     end
 
-    def free
-      # to prevent second free (e.g. during finalize)
-      return if @raw.null?
-      LibGSL.gsl_odeiv2_driver_free(@raw)
-      @raw = Pointer(LibGSL::Gsl_odeiv2_driver).null
-    end
-
-    def finalize
-      free
-    end
-
-    delegate hmin, hmax, nmax, to: @raw.value
+    delegate hmin, hmax, nmax, to: @pointer.value
 
     def hmin=(value)
-      LibGSL.gsl_odeiv2_driver_set_hmin(@raw, value)
+      LibGSL.gsl_odeiv2_driver_set_hmin(@pointer, value)
     end
 
     def hmax=(value)
-      LibGSL.gsl_odeiv2_driver_set_hmax(@raw, value)
+      LibGSL.gsl_odeiv2_driver_set_hmax(@pointer, value)
     end
 
     def nmax=(value)
-      LibGSL.gsl_odeiv2_driver_set_nmax(@raw, value)
+      LibGSL.gsl_odeiv2_driver_set_nmax(@pointer, value)
     end
 
     def reset(initial_step)
-      LibGSL.gsl_odeiv2_driver_reset_hstart(@raw, initial_step)
+      LibGSL.gsl_odeiv2_driver_reset_hstart(@pointer, initial_step)
     end
 
     def reset
-      LibGSL.gsl_odeiv2_driver_reset(@raw)
+      LibGSL.gsl_odeiv2_driver_reset(@pointer)
     end
 
     property initial_step : Float64
@@ -138,7 +127,7 @@ module GSL::ODE
       raise ArgumentError.new("Algorithm #{algorithm} requires JacobianSystem") if algorithm.require_jacobian? && !@system.is_a?(JacobianSystem)
       if scale_abs
         raise ArgumentError.new("Scales size should match dimension of system") if scale_abs.size != @system.size
-        @raw = LibGSL.gsl_odeiv2_driver_alloc_scaled_new(
+        @pointer = LibGSL.gsl_odeiv2_driver_alloc_scaled_new(
           @system.to_unsafe,
           algorithm.to_unsafe,
           initial_step,
@@ -146,7 +135,7 @@ module GSL::ODE
           a_y, a_dydt,
           scale_abs.to_unsafe)
       else
-        @raw = LibGSL.gsl_odeiv2_driver_alloc_standard_new(
+        @pointer = LibGSL.gsl_odeiv2_driver_alloc_standard_new(
           @system.to_unsafe,
           algorithm.to_unsafe,
           initial_step,
@@ -159,7 +148,7 @@ module GSL::ODE
     def apply(t0 : Float64, t1 : Float64, y : Array(Float64) | Slice(Float64))
       raise ArgumentError.new("State size should match dimension of system") unless y.size == @system.size
       y = y.to_unsafe.to_slice(y.size) unless y.is_a? Slice
-      LibGSL.gsl_odeiv2_driver_apply(@raw, pointerof(t0), t1, y)
+      LibGSL.gsl_odeiv2_driver_apply(@pointer, pointerof(t0), t1, y)
     end
 
     # high level API
@@ -207,7 +196,7 @@ module GSL::ODE
       reset(@initial_step)
       h = @initial_step
       while t < t1
-        LibGSL.gsl_odeiv2_evolve_apply(@raw.value.e, @raw.value.c, @raw.value.s, @raw.value.sys, pointerof(t), t1, pointerof(h), @state)
+        LibGSL.gsl_odeiv2_evolve_apply(@pointer.value.e, @pointer.value.c, @pointer.value.s, @pointer.value.sys, pointerof(t), t1, pointerof(h), @state)
         raise "ODE doesn't converge" if h < hmin
         yield(@state, t)
       end

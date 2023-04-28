@@ -101,14 +101,8 @@ module GSL
       Int32.new(LibGSL.gsl_spmatrix_nnz(self))
     end
 
-    def free
-      return if @pointer.null?
+    def lib_free
       LibGSL.gsl_spmatrix_free(@pointer)
-      @pointer = Pointer(LibGSL::Gsl_spmatrix).null
-    end
-
-    def finalize
-      free
     end
 
     def convert(type : Type)

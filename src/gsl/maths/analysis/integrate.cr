@@ -40,8 +40,7 @@ module GSL::Integration
     GSL_INTEG_GAUSS61 = 6
   end
 
-  private class Workspace(T)
-    @raw : Pointer(T)
+  private class Workspace(T) < GSL::Object
     getter size : Int32
 
     private def lib_alloc(size) : Pointer(T)
@@ -70,29 +69,23 @@ module GSL::Integration
 
     def initialize
       @size = 0
-      @raw = Pointer(T).null
+      @pointer = Pointer(T).null
     end
 
     def initialize(@size)
-      @raw = lib_alloc(@size)
+      @pointer = lib_alloc(@size)
     end
 
     def resize(new_size)
       return if new_size <= size
-      lib_free(@raw) unless size == 0
+      lib_free(@pointer) unless size == 0
       @size = new_size
-      @raw = lib_alloc(@size)
+      @pointer = lib_alloc(@size)
     end
 
-    def free
-      return if @size == 0
+    def lib_free
       @size = 0
-      lib_free(@raw)
-      @raw = Pointer(T).null
-    end
-
-    def to_unsafe
-      @raw
+      lib_free(@pointer)
     end
   end
 

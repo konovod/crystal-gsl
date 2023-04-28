@@ -1,7 +1,6 @@
 module GSL
   # 1D Interpolation object
-  class Interpolate1D
-    @raw : Pointer(LibGSL::Gsl_interp)
+  class Interpolate1D < GSL::Object
     @acc : Pointer(LibGSL::Gsl_interp_accel)
     @xa : Slice(Float64)
     @ya : Slice(Float64)
@@ -49,18 +48,14 @@ module GSL
       ya = Slice(Float64).new(ya.to_unsafe, ya.size, read_only: true) if ya.is_a? Array(Float64)
       raise ArgumentError.new("xa.size != ya.size (#{xa.size} != #{ya.size})") unless xa.size == ya.size
       raise ArgumentError.new("xa.size < minimum for #{type.to_s} (#{xa.size} < #{type.min_points})") unless xa.size >= type.min_points
-      @raw = LibGSL.gsl_interp_alloc(type, xa.size)
+      @pointer = LibGSL.gsl_interp_alloc(type, xa.size)
       @xa = xa.dup
       @ya = ya.dup
       @acc = LibGSL.gsl_interp_accel_alloc
-      LibGSL.gsl_interp_init(@raw, @xa, @ya, @xa.size)
+      LibGSL.gsl_interp_init(@pointer, @xa, @ya, @xa.size)
     end
 
     getter type
-
-    def to_unsafe
-      @raw
-    end
 
     def x
       Slice.new(@xa.to_unsafe, @xa.size, read_only: true)
@@ -85,18 +80,12 @@ module GSL
         raise ArgumentError.new("Updated ya must have same size (#{ya.size} != #{size})") unless ya.size == size
         @ya.copy_from(ya.to_unsafe, ya.size)
       end
-      LibGSL.gsl_interp_init(@raw, @xa, @ya, @xa.size)
+      LibGSL.gsl_interp_init(@pointer, @xa, @ya, @xa.size)
     end
 
-    def free
-      return if @raw.null?
-      LibGSL.gsl_interp_free(@raw)
+    def lib_free
+      LibGSL.gsl_interp_free(@pointer)
       LibGSL.gsl_interp_accel_free(@acc)
-      @raw = Pointer(LibGSL::Gsl_interp).null
-    end
-
-    def finalize
-      free
     end
 
     enum DerivativeOrder
@@ -109,20 +98,20 @@ module GSL
       result = 0.0
       case deriv
       in .function?
-        code = LibGSL.gsl_interp_eval_e(@raw, @xa, @ya, x, @acc, pointerof(result))
+        code = LibGSL.gsl_interp_eval_e(@pointer, @xa, @ya, x, @acc, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp_eval_e")
       in .first_derivative?
-        code = LibGSL.gsl_interp_eval_deriv_e(@raw, @xa, @ya, x, @acc, pointerof(result))
+        code = LibGSL.gsl_interp_eval_deriv_e(@pointer, @xa, @ya, x, @acc, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp_eval_deriv_e")
       in .second_derivative?
-        code = LibGSL.gsl_interp_eval_deriv2_e(@raw, @xa, @ya, x, @acc, pointerof(result))
+        code = LibGSL.gsl_interp_eval_deriv2_e(@pointer, @xa, @ya, x, @acc, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp_eval_deriv2_e")
       end
       result
     end
 
     def integrate(a, b)
-      code = LibGSL.gsl_interp_eval_integ_e(@raw, @xa, @ya, a, b, @acc, out result)
+      code = LibGSL.gsl_interp_eval_integ_e(@pointer, @xa, @ya, a, b, @acc, out result)
       GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp_eval_integ_e")
       result
     end
@@ -132,8 +121,7 @@ module GSL
     end
   end
 
-  class Interpolate2D
-    @raw : Pointer(LibGSL::Gsl_interp2d)
+  class Interpolate2D < GSL::Object
     @accx : Pointer(LibGSL::Gsl_interp_accel)
     @accy : Pointer(LibGSL::Gsl_interp_accel)
     @xa : Slice(Float64)
@@ -170,20 +158,16 @@ module GSL
       raise ArgumentError.new("xa.size*ya.size != za.size (#{xa.size}*#{ya.size} != #{za.size})") unless xa.size*ya.size == za.size
       raise ArgumentError.new("xa.size < minimum for #{type.to_s} (#{xa.size} < #{type.min_points})") unless xa.size >= type.min_points
       raise ArgumentError.new("ya.size < minimum for #{type.to_s} (#{ya.size} < #{type.min_points})") unless ya.size >= type.min_points
-      @raw = LibGSL.gsl_interp2d_alloc(type, xa.size, ya.size)
+      @pointer = LibGSL.gsl_interp2d_alloc(type, xa.size, ya.size)
       @xa = xa.dup
       @ya = ya.dup
       @za = za.dup
       @accx = LibGSL.gsl_interp_accel_alloc
       @accy = LibGSL.gsl_interp_accel_alloc
-      LibGSL.gsl_interp2d_init(@raw, @xa, @ya, @za, @xa.size, @ya.size)
+      LibGSL.gsl_interp2d_init(@pointer, @xa, @ya, @za, @xa.size, @ya.size)
     end
 
     getter type
-
-    def to_unsafe
-      @raw
-    end
 
     def x
       Slice.new(@xa.to_unsafe, @xa.size, read_only: true)
@@ -215,19 +199,13 @@ module GSL
         raise ArgumentError.new("Updated za must have same size (#{za.size} != #{size[0]*size[1]})") unless za.size == size[0]*size[1]
         @za.copy_from(za.to_unsafe, za.size)
       end
-      LibGSL.gsl_interp_init(@raw, @xa, @ya, @xa.size)
+      LibGSL.gsl_interp_init(@pointer, @xa, @ya, @xa.size)
     end
 
-    def free
-      return if @raw.null?
-      LibGSL.gsl_interp2d_free(@raw)
+    def lib_free
+      LibGSL.gsl_interp2d_free(@pointer)
       LibGSL.gsl_interp_accel_free(@accx)
       LibGSL.gsl_interp_accel_free(@accy)
-      @raw = Pointer(LibGSL::Gsl_interp2d).null
-    end
-
-    def finalize
-      free
     end
 
     enum DerivativeOrder
@@ -244,25 +222,25 @@ module GSL
       result = 0.0
       case deriv
       in .function?
-        code = LibGSL.gsl_interp2d_eval_e(@raw, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
+        code = LibGSL.gsl_interp2d_eval_e(@pointer, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp2d_eval_e")
       in .extrapolate?
-        code = LibGSL.gsl_interp2d_eval_extrap_e(@raw, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
+        code = LibGSL.gsl_interp2d_eval_extrap_e(@pointer, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp2d_eval_extrap_e")
       in .df_dx?
-        code = LibGSL.gsl_interp2d_eval_deriv_x_e(@raw, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
+        code = LibGSL.gsl_interp2d_eval_deriv_x_e(@pointer, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp2d_eval_deriv_x_e")
       in .df_dy?
-        code = LibGSL.gsl_interp2d_eval_deriv_y_e(@raw, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
+        code = LibGSL.gsl_interp2d_eval_deriv_y_e(@pointer, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp2d_eval_deriv_y_e")
       in .d2f_dx2?
-        code = LibGSL.gsl_interp2d_eval_deriv_xx_e(@raw, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
+        code = LibGSL.gsl_interp2d_eval_deriv_xx_e(@pointer, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp2d_eval_deriv_xx_e")
       in .d2f_dx_dy?
-        code = LibGSL.gsl_interp2d_eval_deriv_xy_e(@raw, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
+        code = LibGSL.gsl_interp2d_eval_deriv_xy_e(@pointer, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp2d_eval_deriv_xy_e")
       in .d2f_dy2?
-        code = LibGSL.gsl_interp2d_eval_deriv_yy_e(@raw, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
+        code = LibGSL.gsl_interp2d_eval_deriv_yy_e(@pointer, @xa, @ya, @za, x, y, @accx, @accy, pointerof(result))
         GSL.check_return_code(LibGSL::Code.new(code), "gsl_interp2d_eval_deriv_yy_e")
       end
       result

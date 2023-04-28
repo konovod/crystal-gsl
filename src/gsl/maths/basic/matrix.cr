@@ -1,4 +1,4 @@
-require "../../../gsl/base/matrix.cr"
+require "../../base/matrix.cr"
 
 module GSL
   class DenseMatrix < Matrix

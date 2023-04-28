@@ -1,11 +1,7 @@
+require "./object"
+
 module GSL
-  abstract class Matrix
-    getter pointer
-
-    def to_unsafe
-      pointer
-    end
-
+  abstract class Matrix < GSL::Object
     def nrows : Int32
       Int32.new @pointer.value.size1
     end
@@ -149,14 +145,8 @@ module GSL
       return matrix
     end
 
-    def free
-      return if @pointer.null?
+    def lib_free
       LibGSL.gsl_matrix_free(@pointer)
-      @pointer = Pointer(LibGSL::Gsl_matrix).null
-    end
-
-    def finalize
-      free
     end
 
     def set_all(n : Float64 | Int32)
