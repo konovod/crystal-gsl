@@ -1,7 +1,6 @@
 module GSL
   # Class representing Chebyshev approximations to univariate functions
   class Chebyshev < GSL::Object
-
     def order
       @pointer.value.order
     end
