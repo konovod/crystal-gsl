@@ -3,12 +3,12 @@ require "./spec_helper"
 describe Statistics do
   describe "Binomial" do
     it "must return the correct number of elements" do
-      samples = Statistics::Binomial.sample(100, 0.5, 1_u64)
+      samples = Statistics::Binomial.sample(100, 0.5, 1_u32)
       samples.size.should eq 100
     end
 
     it "must return samples within the number of trials" do
-      samples = Statistics::Binomial.sample(100, 0.5, 1_u64)
+      samples = Statistics::Binomial.sample(100, 0.5, 1_u32)
       samples.all? { |x| x == 0 || x == 1 }.should eq true
     end
   end
