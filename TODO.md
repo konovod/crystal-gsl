@@ -19,7 +19,7 @@ Status of GSL areas (list taken from [GSL docs](https://www.gnu.org/software/gsl
 | Numerical Integration | Done |  |
 | Random Number Generation | Not planned | Already in Crystal stdlib |
 | Quasi-Random Sequences | - | Not a priority for me (PR welcome though) |
-| Random Number Distributions | Partially done | Not a priority for me (PR welcome though) |
+| Random Number Distributions | Partially done | Most distributions from GSL works |
 | Statistics | Partially done | Not a priority for me (PR welcome though) |
 | Running Statistics | - | Not a priority for me (PR welcome though) |
 | Moving Window Statistics | - | Not a priority for me (PR welcome though) |

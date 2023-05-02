@@ -92,6 +92,12 @@ describe Statistics do
       samples = cauchy.sample(n)
       samples.size.should eq n
     end
+
+    it "should return correct cdf and pdf" do
+      cauchy = Statistics::Cauchy.new 1.0
+      cauchy.cdf(0.0).should eq 0.5
+      cauchy.pdf(0.0).should be_close 1/Math::PI, 1e-9
+    end
   end
 
   describe "Matrix" do

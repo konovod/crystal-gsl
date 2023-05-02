@@ -42,7 +42,11 @@ module Statistics
       end
 
       def pdf(x : {{continuous ? Float64 : Int}} ) : Float64
-          return LibGSL.gsl_ran_{{gsl_name.id}}_pdf(x, {{ *params.map(&.var) }})
+        return LibGSL.gsl_ran_{{gsl_name.id}}_pdf(x, {{ *params.map(&.var) }})
+      end
+
+      def cdf(x : {{continuous ? Float64 : Int}} ) : Float64
+        return LibGSL.gsl_cdf_{{gsl_name.id}}_P(x, {{ *params.map(&.var) }})
       end
 
       def self.sample({{ *params }}) : {{continuous ? Float64 : Int}}
