@@ -98,6 +98,14 @@ describe Statistics do
       cauchy.cdf(0.0).should eq 0.5
       cauchy.pdf(0.0).should be_close 1/Math::PI, 1e-9
     end
+
+    it "should support sampling using given rng" do
+      cauchy = Statistics::Cauchy.new 1.0
+      rng1 = Random::PCG32.new(1u64)
+      rng2 = Random::PCG32.new(1u64)
+      Statistics::Cauchy.sample(1.0, rng1).should eq cauchy.sample(rng2)
+      Statistics::Cauchy.sample(1.0).should_not eq cauchy.sample(rng2)
+    end
   end
 
   describe "Matrix" do

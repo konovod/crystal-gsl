@@ -1,9 +1,9 @@
 module Statistics
   abstract class DiscreteDistribution
-    abstract def sample : Int
+    abstract def sample(rng : Random? = nil) : Int
 
-    def sample(n : Int32)
-      return Array.new (n) { sample }
+    def sample(n : Int32, rng : Random? = nil)
+      return Array.new (n) { sample(rng) }
     end
 
     def self.sample(n : Int32, *args)
@@ -12,10 +12,10 @@ module Statistics
   end
 
   abstract class ContinuousDistribution
-    abstract def sample : Float64
+    abstract def sample(rng : Random? = nil) : Float64
 
-    def sample(n : Int32) : Array(Float64)
-      return Array.new (n) { sample() }
+    def sample(n : Int32, rng : Random? = nil) : Array(Float64)
+      return Array.new (n) { sample(rng) }
     end
 
     def self.sample(n : Int32, *args) : Array(Float64)
@@ -37,10 +37,6 @@ module Statistics
       end
 
 
-      def sample : {{continuous ? Float64 : Int}} 
-        return {{name.id}}.sample({{ *params.map(&.var) }})
-      end
-
       def pdf(x : {{continuous ? Float64 : Int}} ) : Float64
         return LibGSL.gsl_ran_{{gsl_name.id}}_pdf(x, {{ *params.map(&.var) }})
       end
@@ -49,9 +45,36 @@ module Statistics
         return LibGSL.gsl_cdf_{{gsl_name.id}}_P(x, {{ *params.map(&.var) }})
       end
 
-      def self.sample({{ *params }}) : {{continuous ? Float64 : Int}}
-        return LibGSL.gsl_ran_{{gsl_name.id}}(GSL::RNG, {{ *params.map(&.var) }})
-      end
+      {% if params.size > 0 %}
+        def sample(rng : Random? = nil) : {{continuous ? Float64 : Int}} 
+          return {{name.id}}.sample({{ *params.map(&.var) }}, rng)
+        end
+
+        def self.sample({{ *params }}, rng : Random? = nil) : {{continuous ? Float64 : Int}}
+          if rng
+            rng_value = GSL.wrap_rng(rng)
+            rng = pointerof(rng_value)
+          else
+            rng = GSL::RNG
+          end
+          return LibGSL.gsl_ran_{{gsl_name.id}}(rng, {{ *params.map(&.var) }})
+        end
+      {% else %}
+        def sample(rng : Random? = nil) : {{continuous ? Float64 : Int}} 
+          return {{name.id}}.sample(rng)
+        end
+
+        def self.sample(rng : Random? = nil) : {{continuous ? Float64 : Int}}
+          if rng
+            rng_value = GSL.wrap_rng(rng)
+            rng = pointerof(rng_value)
+          else
+            rng = GSL::RNG
+          end
+        return LibGSL.gsl_ran_{{gsl_name.id}}(rng)
+        end
+      {% end %}
+
 
       end
   end
@@ -93,18 +116,30 @@ module Statistics
   distribution(Logarithmic, false, p : Float64)
 
   class Gamma
-    def self.sample(shape : Float64, scale : Float64) : Float64
+    def self.sample(shape : Float64, scale : Float64, rng : Random? = nil) : Float64
       rate = 1.0 / scale
-      return LibGSL.gsl_ran_gamma(GSL::RNG, shape, rate)
+      if rng
+        rng_value = GSL.wrap_rng(rng)
+        rng = pointerof(rng_value)
+      else
+        rng = GSL::RNG
+      end
+      return LibGSL.gsl_ran_gamma(rng, shape, rate)
     end
   end
 
   class Normal
-    def self.sample(mean : Float64, std : Float64) : Float64
-      return LibGSL.gsl_ran_gaussian(GSL::RNG, std) + mean
+    def self.sample(mean : Float64, std : Float64, rng : Random? = nil) : Float64
+      if rng
+        rng_value = GSL.wrap_rng(rng)
+        rng = pointerof(rng_value)
+      else
+        rng = GSL::RNG
+      end
+      return LibGSL.gsl_ran_gaussian(rng, std) + mean
     end
 
-    def self.pdf(mean : Float64, std : Float64)
+    def self.pdf(mean : Float64, std : Float64, rng : Random? = nil)
       return LibGSL.gsl_ran_gaussian_pdf(x - mean, std)
     end
   end
@@ -183,8 +218,8 @@ module Statistics
       return shape * Math.log(scale) - GSL.lngamma(shape) + -(shape + 1) * Math.log(x) + -scale/x
     end
 
-    def sample : Float64
-      return 1.0 / Gamma.next(@shape, @scale)
+    def sample(rng : Random? = nil) : Float64
+      return 1.0 / Gamma.next(@shape, @scale, rng)
     end
   end
 
@@ -205,8 +240,8 @@ module Statistics
     # u = DiscreteUniform.new 0, 2
     # u.sample # => 1
     # ```
-    def sample : Int
-      DiscreteUniform.sample(@min, @max)
+    def sample(rng : Random? = nil) : Int
+      DiscreteUniform.sample(@min, @max, rng)
     end
 
     # Returns a random integer from *min* to *max*
@@ -214,11 +249,11 @@ module Statistics
     # ```
     # DiscreteUniform.sample(0, 2) # => 1
     # ```
-    def self.sample(min : Int, max : Int)
+    def self.sample(min : Int, max : Int, rng : Random? = nil)
       if max < min
         raise ArgumentError.new("Maximum cannot be smaller than minimum")
       end
-      Random.new.rand(min..max)
+      (rng || Random::DEFAULT).rand(min..max)
     end
 
     # Returns an array of random integers from *min* to *max*
@@ -226,8 +261,8 @@ module Statistics
     # ```
     # DiscreteUniform.sample(4, 0, 2) # => [0, 2, 1, 1, 2]
     # ```
-    def self.sample(n : Int, min : Int, max : Int)
-      (0...n).map { |i| DiscreteUniform.sample min, max }
+    def self.sample(n : Int, min : Int, max : Int, rng : Random? = nil)
+      (0...n).map { |i| DiscreteUniform.sample min, max, rng }
     end
   end
 end
