@@ -32,6 +32,15 @@ module GSL
       a.to_unsafe.copy_to(raw.data, a.size)
     end
 
+    def initialize(*, unsafe_from)
+      @raw = LibGSL::Gsl_vector.new(
+        size: unsafe_from.size,
+        stride: 1,
+        data: unsafe_from.to_unsafe,
+        block: nil,
+        owner: 0)
+    end
+
     def ==(n : GSL::Vector) : Bool
       LibGSL.gsl_vector_equal(self.pointer, n.pointer) == 1 ? true : false
     end
