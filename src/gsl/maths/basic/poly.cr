@@ -2,6 +2,8 @@ require "complex"
 
 module GSL
   # Poly class represents polinomial c0+c1*x+c2*x*x+...
+  #
+  # See Also `PolyDD` for divided difference representation
   class Poly
     # Returns coefficients of polynomial
     getter coeffs : Array(Float64)

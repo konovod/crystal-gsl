@@ -8,7 +8,7 @@ module GSL::Siman
   #
   # User should define `clone` if copying it is not trivial
   abstract struct Configuration
-    # This function should return the energy of a configuration:
+    # This function should return the energy of a configuration. Less energy == more optimal configuration.
     abstract def energy : Float64
     # This function should modify the configuration using a random step taken from the generator `rng`, up to a maximum distance of `step_size`:
     abstract def step(rng : Random, step_size : Float64) : self

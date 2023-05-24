@@ -67,7 +67,6 @@ module GSL
     def_function_with_mode(airy_Bi_deriv)
     def_function_with_mode(airy_Ai_deriv_scaled)
     def_function_with_mode(airy_Bi_deriv_scaled)
-
     def_function_with_args(airy_zero_Ai, s : UInt32)
     def_function_with_args(airy_zero_Bi, s : UInt32)
     def_function_with_args(airy_zero_Ai_deriv, s : UInt32)
