@@ -45,7 +45,7 @@ module GSL
     end
 
     def sum
-      self.to_a.sum
+      self.to_slice.sum
     end
 
     def dot(n : GSL::Vector)

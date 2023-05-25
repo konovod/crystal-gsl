@@ -3,7 +3,7 @@ require "./matrix.cr"
 module GSL
   struct Vector
     def each(&block : Float64 -> _)
-      self.to_a.each &block
+      self.to_slice.each &block
       self
     end
 

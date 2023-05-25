@@ -1,7 +1,7 @@
 module GSL
   struct Vector
     def frequencies
-      self.to_a.group_by { |x| x }.map { |num, arr| [num, arr.size] }.to_h
+      self.to_slice.group_by { |x| x }.map { |num, arr| [num, arr.size] }.to_h
     end
 
     # alias for frequencies
@@ -16,7 +16,7 @@ module GSL
     end
 
     def proportion(n : Float64 | Int32)
-      self.to_a.count(n.to_f) / self.size.to_f
+      self.to_slice.count(n.to_f) / self.size.to_f
     end
 
     def ranked
@@ -24,7 +24,7 @@ module GSL
       rank = self.sort.frequencies
       rank.keys.each_with_index do |y, ind|
         temp = [] of Int32
-        self.to_a.each_with_index do |x, index|
+        self.to_slice.each_with_index do |x, index|
           if y == x
             temp << index + 1
           end

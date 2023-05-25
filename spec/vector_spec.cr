@@ -204,7 +204,7 @@ describe GSL::Vector do
   end
   describe "#mean" do
     it "should return the correct mean" do
-      (GSL::Vector.new [0.0, -5.0, 7.3]).mean.should eq 0.76666666666666661
+      (GSL::Vector.new [0.0, -5.0, 7.3]).mean.should be_close 0.766666666667, 1e-12
     end
   end
 end

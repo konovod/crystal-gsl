@@ -79,7 +79,7 @@ module GSL
     # data.includes? 2 => true
     # ```
     def includes?(n : Float64 | Int32) : Bool
-      self.to_a.includes? n.to_f
+      self.to_slice.includes? n.to_f
     end
 
     # Add element to the button of vector
@@ -105,9 +105,7 @@ module GSL
     # a => GSL::Vector: [2.0,5.0,3.0,7.0,1.0]
     # ```
     def sort : Vector
-      temp = GSL::Vector.new self.to_a
-      LibGSL.gsl_sort_vector(temp.pointer)
-      temp
+      clone.sort!
     end
 
     # change current vector in ascending order
@@ -195,9 +193,7 @@ module GSL
     # a => GSL::Vector [1.0,2.0,3.0]
     # ```
     def reverse
-      temp = GSL::Vector.new self.to_a
-      LibGSL.gsl_vector_reverse(temp.pointer)
-      temp
+      clone.reverse!
     end
 
     # reverse elements of current vector
@@ -336,9 +332,7 @@ module GSL
     # a => GSL::Vector: [-1.0,-1.0,1.0]
     # ```
     def set_zero : Vector
-      temp = GSL::Vector.new self.to_a
-      LibGSL.gsl_vector_set_zero(temp.pointer)
-      temp
+      clone.set_zero!
     end
 
     # set current vector's elements to zero
@@ -361,9 +355,7 @@ module GSL
     # a => GSL::Vector: [-1.0,-1.0,1.0]
     # ```
     def set_all(n : Int32 | Float64) : Vector
-      temp = GSL::Vector.new self.to_a
-      LibGSL.gsl_vector_set_all(temp.pointer, n.to_f)
-      temp
+      clone.set_all!(n)
     end
 
     # set current vector's elements to input value
@@ -386,9 +378,7 @@ module GSL
     # a => GSL::Vector: [-1.0,-1.0,1.0]
     # ```
     def set_basis(n : Int32) : Vector
-      temp = GSL::Vector.new self.to_a
-      LibGSL.gsl_vector_set_basis(temp.pointer, n)
-      temp
+      clone.set_basis!(n)
     end
 
     # set current vector's elements to zero except the input index
@@ -410,7 +400,7 @@ module GSL
     # a => 0.76666666666666661
     # ```
     def mean : Float64
-      return Statistics.mean(self.to_a)
+      LibGSL.gsl_stats_mean(raw.data, raw.stride, raw.size)
     end
   end
 end
