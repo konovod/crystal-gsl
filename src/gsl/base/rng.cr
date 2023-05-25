@@ -9,6 +9,7 @@ module GSL
     get_double: ->(ptr : Void*) { ptr.as(Box(Random)).object.next_float }
   )
 
+  # Wraps Crystal `Random` rng to `Gsl_rng` structure. Used internally in high-level wrappers.
   def self.wrap_rng(random : Random) : LibGSL::Gsl_rng
     LibGSL::Gsl_rng.new(
       type: pointerof(RNG_WRAPPER),

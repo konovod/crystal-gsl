@@ -2,8 +2,6 @@ module GSL
   struct Vector
     getter raw : LibGSL::Gsl_vector
 
-    # @block : LibGSL::Gsl_block
-
     def size : Int32
       @raw.size.to_i32
     end
@@ -80,7 +78,6 @@ module GSL
     # data = [1,2,3].to_vector
     # data.includes? 2 => true
     # ```
-
     def includes?(n : Float64 | Int32) : Bool
       self.to_a.includes? n.to_f
     end
@@ -91,13 +88,11 @@ module GSL
     # a = [1,2,3].to_vector
     # a.push 4 => GSL::Vector: [1.0,2.0,3.0,4.0]
     # ```
-
     def push(n : Float64 | Int32) : Vector
       (self.to_a.push n.to_f).to_vector
     end
 
     # alias of push methods
-
     def <<(n : Float64 | Int32) : Vector
       self.push n.to_f
     end
@@ -109,7 +104,6 @@ module GSL
     # a.sort => GSL::Vector: [1.0,2.0,3.0,5.0,7.0]
     # a => GSL::Vector: [2.0,5.0,3.0,7.0,1.0]
     # ```
-
     def sort : Vector
       temp = GSL::Vector.new self.to_a
       LibGSL.gsl_sort_vector(temp.pointer)
@@ -145,7 +139,6 @@ module GSL
     # a = [1,2,3,4,5,6,7,8]to_vector
     # a.head => GSL::Vector: [1.0,2.0,3.0,4.0,5.0]
     # ```
-
     def head : Vector
       self.size >= 5 ? ((0...5).map { |x| self[x] }).to_vector : self
     end
@@ -156,7 +149,6 @@ module GSL
     # a = [1,2,3,4,5,6,7,8]to_vector
     # a.tail => GSL::Vector: [2.0,3.0,4.0,5.0,6.0]
     # ```
-
     def tail : Vector
       self.size >= 5 ? ((self.size - 5...self.size).map { |x| self[x] }).to_vector : self
     end
@@ -180,7 +172,6 @@ module GSL
     # a => GSL::Vector: [2.0,3.0,4.0]
     # a.replace c => length error
     # ```
-
     def replace(n : GSL::Vector) : Vector
       LibGSL.gsl_vector_memcpy(self.pointer, n.pointer)
       self
@@ -203,7 +194,6 @@ module GSL
     # a.reverse => GSL::Vector: [3.0,2.0,1.0]
     # a => GSL::Vector [1.0,2.0,3.0]
     # ```
-
     def reverse
       temp = GSL::Vector.new self.to_a
       LibGSL.gsl_vector_reverse(temp.pointer)
@@ -217,7 +207,6 @@ module GSL
     # a.reverse! => GSL::Vector: [3.0,2.0,1.0]
     # a => GSL::Vector: [3.0,2.0,1.0]
     # ```
-
     def reverse! : Vector
       LibGSL.gsl_vector_reverse(self.pointer)
       self
@@ -230,7 +219,6 @@ module GSL
     # a = [1,2,3].to_vector
     # a.max => 3.0
     # ```
-
     def max : Float64
       LibGSL.gsl_vector_max(self.pointer)
     end
@@ -276,7 +264,6 @@ module GSL
     # a = [1,2,3].to_vector
     # a.min_index => 0
     # ```
-
     def min_index : UInt64
       LibGSL.gsl_vector_min_index(self.pointer)
     end
@@ -289,7 +276,6 @@ module GSL
     # min = 0
     # max = 2
     # ```
-
     def minmax_index : Array(UInt64)
       [self.min_index, self.max_index]
     end
@@ -314,7 +300,6 @@ module GSL
     # a.empty? => true
     # b.empty? => false
     # ```
-
     def pos? : Bool
       LibGSL.gsl_vector_ispos(self.pointer) == 1 ? true : false
     end
@@ -327,7 +312,6 @@ module GSL
     # a.empty? => true
     # b.empty? => false
     # ```
-
     def neg? : Bool
       LibGSL.gsl_vector_isneg(self.pointer) == 1 ? true : false
     end
@@ -340,7 +324,6 @@ module GSL
     # a.empty? => true
     # b.empty? => false
     # ```
-
     def has_neg? : Bool
       LibGSL.gsl_vector_isnonneg(self.pointer) == 1 ? false : true
     end
@@ -352,7 +335,6 @@ module GSL
     # a.set_zero => GSL::Vector: [0.0,0.0,0.0]
     # a => GSL::Vector: [-1.0,-1.0,1.0]
     # ```
-
     def set_zero : Vector
       temp = GSL::Vector.new self.to_a
       LibGSL.gsl_vector_set_zero(temp.pointer)
@@ -366,7 +348,6 @@ module GSL
     # a.set_zero => GSL::Vector: [0.0,0.0,0.0]
     # a => GSL::Vector: [0.0,0.0,0.0]
     # ```
-
     def set_zero! : Vector
       LibGSL.gsl_vector_set_zero(self.pointer)
       self
@@ -379,7 +360,6 @@ module GSL
     # a.set_all! 2 => GSL::Vector: [2.0,2.0,2.0]
     # a => GSL::Vector: [-1.0,-1.0,1.0]
     # ```
-
     def set_all(n : Int32 | Float64) : Vector
       temp = GSL::Vector.new self.to_a
       LibGSL.gsl_vector_set_all(temp.pointer, n.to_f)
@@ -393,7 +373,6 @@ module GSL
     # a.set_all! 2 => GSL::Vector: [2.0,2.0,2.0]
     # a => GSL::Vector: [2.0,2.0,2.0]
     # ```
-
     def set_all!(n : Int32 | Float64) : Vector
       LibGSL.gsl_vector_set_all(self.pointer, n.to_f)
       self
@@ -406,7 +385,6 @@ module GSL
     # a.set_basis 2 => GSL::Vector: [0.0,0.0,1.0]
     # a => GSL::Vector: [-1.0,-1.0,1.0]
     # ```
-
     def set_basis(n : Int32) : Vector
       temp = GSL::Vector.new self.to_a
       LibGSL.gsl_vector_set_basis(temp.pointer, n)
@@ -420,7 +398,6 @@ module GSL
     # a.set_basis! 2 => GSL::Vector: [0.0,0.0,1.0]
     # a => GSL::Vector: [0.0,0.0,1.0]
     # ```
-
     def set_basis!(n : Int32) : Vector
       LibGSL.gsl_vector_set_basis(self.pointer, n)
       self
