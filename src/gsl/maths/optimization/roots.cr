@@ -77,87 +77,72 @@ module GSL::Roots
   #
   # - `algorithm` - root bracketing algorithm to be used
   #
-  # returns nil if number of iterations = `max_iter` is exceeded
-  #
-  # returns root value if precision = `eps` achieved
-  def self.find_root?(x_lower : Float64, x_upper : Float64, eps : Float64 = 1e-9, *,
-                      algorithm : GSL::Roots::TypeBracketing = GSL::Roots::TypeBracketing::BrentDekker,
-                      max_iter = 1000, &f : GSL::Function)
+  # returns `{result, x_root}`
+  #  - `result` (type `GSL::Result`) represents result of minimization
+  #  - `x_root` - value of root on last iteration
+  def self.find_root(f : GSL::Function, x_lower : Float64, x_upper : Float64, eps : Float64 = 1e-9, *,
+                     algorithm : GSL::Roots::TypeBracketing = GSL::Roots::TypeBracketing::BrentDekker,
+                     max_iter = 10000)
     raw = LibGSL.gsl_root_fsolver_alloc(algorithm.to_unsafe)
     begin
       function = GSL.wrap_function(f)
       LibGSL.gsl_root_fsolver_set(raw, pointerof(function), x_lower, x_upper)
       max_iter.times do
         LibGSL.gsl_root_fsolver_iterate(raw)
-        if LibGSL::Code.new(LibGSL.gsl_root_test_interval(raw.value.x_lower, raw.value.x_upper, eps, 0.0)) == LibGSL::Code::GSL_SUCCESS
-          return raw.value.root
+        if (raw.value.x_upper - raw.value.x_lower) < eps
+          return GSL::Result::Success, raw.value.root
         end
       end
-      return nil
+      return GSL::Result::IterationLimit, raw.value.root
     ensure
       LibGSL.gsl_root_fsolver_free(raw)
     end
   end
 
-  # High-level interface to root finder. Finds root of function f between `x_lower` and `x_upper`
-  #
-  # due to nature of used algorithms, signs of function in `x_lower` and `x_upper` must differ
-  #
-  # - `algorithm` - root bracketing algorithm to be used
-  #
-  # raises IterationsLimitExceeded if number of iterations = `max_iter` is exceeded
-  #
-  # returns root value if precision = `eps` achieved
   def self.find_root(x_lower : Float64, x_upper : Float64, eps : Float64 = 1e-9, *,
                      algorithm : GSL::Roots::TypeBracketing = GSL::Roots::TypeBracketing::BrentDekker,
-                     max_iter = 1000, &f : GSL::Function)
-    find_root?(x_lower, x_upper, eps, algorithm: algorithm, max_iter: max_iter, &f) || raise IterationsLimitExceeded.new("roots bracketing didn't converge")
+                     max_iter = 10000, &f : GSL::Function)
+    find_root(f, x_lower, x_upper, eps, algorithm: algorithm, max_iter: max_iter)
   end
 
   # High-level interface to root polishing. Finds root of function f near `initial_guess`
   #
   # - `algorithm` - root bracketing algorithm to be used
   #
-  # returns nil if number of iterations = `max_iter` is exceeded or current root estimation is outside `x_possible` range.
-  #
-  # returns root value if precision = `eps` achieved
-  def self.polish_root?(initial_guess : Float64, eps : Float64 = 1e-9, *,
-                        x_possible : Range(Float64?, Float64?)? = nil,
-                        algorithm : GSL::Roots::TypePolishing = GSL::Roots::TypePolishing::Steffenson,
-                        max_iter = 1000, &f : GSL::FunctionFDF)
+  # returns `{result, x_root}`
+  #  - `result` (type `GSL::Result`) represents result of minimization
+  #  - `x_root` - value of root on last iteration
+  def self.polish_root(f : GSL::FunctionFDF, initial_guess : Float64, eps : Float64 = 1e-9, *,
+                       x_possible : Range(Float64?, Float64?)? = nil,
+                       algorithm : GSL::Roots::TypePolishing = GSL::Roots::TypePolishing::Steffenson,
+                       max_iter = 10000)
     raw = LibGSL.gsl_root_fdfsolver_alloc(algorithm.to_unsafe)
     begin
       function = GSL.wrap_function(f)
       LibGSL.gsl_root_fdfsolver_set(raw, pointerof(function), initial_guess)
       x0 = initial_guess
-      max_iter.times do
+      max_iter.times do |i|
         LibGSL.gsl_root_fdfsolver_iterate(raw)
         x1 = raw.value.root
         if x_possible
-          return nil unless x_possible.includes? x1
+          return Result::NoConvergence, raw.value.root unless x_possible.includes? x1
         end
-        if LibGSL::Code.new(LibGSL.gsl_root_test_delta(x1, x0, eps, 0.0)) == LibGSL::Code::GSL_SUCCESS
-          return x1
+        # pp! i, x0, x1, eps, (x0 - x1).abs
+        if (x0 - x1).abs < eps
+          return Result::Success, x1
         end
         x0 = x1
       end
-      return nil
+      return Result::IterationLimit, raw.value.root
     ensure
       LibGSL.gsl_root_fdfsolver_free(raw)
     end
   end
 
-  # High-level interface to root polishing. Finds root of function f near `initial_guess`
-  #
-  # - `algorithm` - root bracketing algorithm to be used
-  #
-  # raises IterationsLimitExceeded if number of iterations = `max_iter` is exceeded or current root estimation is outside `x_possible` range.
-  #
-  # returns root value if precision = `eps` achieved
   def self.polish_root(initial_guess : Float64, eps : Float64 = 1e-9, *,
                        x_possible : Range(Float64?, Float64?)? = nil,
                        algorithm : GSL::Roots::TypePolishing = GSL::Roots::TypePolishing::Steffenson,
-                       max_iter = 1000, &f : GSL::FunctionFDF)
-    polish_root?(initial_guess, eps, x_possible: x_possible, algorithm: algorithm, max_iter: max_iter, &f) || raise IterationsLimitExceeded.new("roots polishing didn't converge")
+                       max_iter = 10000, &f : GSL::FunctionFDF)
+    polish_root(f, initial_guess, eps, x_possible: x_possible, algorithm: algorithm, max_iter: max_iter)
   end
 end

@@ -5,9 +5,6 @@ module GSL
   class NonIdenticalHistograms < ::Exception
   end
 
-  class IterationsLimitExceeded < ::Exception
-  end
-
   class Exception < ::Exception
   end
 
