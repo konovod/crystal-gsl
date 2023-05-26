@@ -70,7 +70,7 @@ module GSL::MultiRoot
   # returns `{result, x_root}`
   #  - `result` (type `GSL::Result`) represents result of minimization
   #  - `x_root` - value of root on last iteration
-  def self.find_root(f : GSL::Function, initial : GSL::Vector, eps_x : Float64 = 1e-6, eps_f : Float64 = 1e-9, *,
+  def self.find_root(f : GSL::MultiRootFunction, initial : GSL::Vector, eps_x : Float64 = 1e-6, eps_f : Float64 = 1e-9, *,
                      algorithm : GSL::Roots::AlgorithmF = GSL::MultiRoot::AlgorithmF::HybridScaled,
                      max_iter = 10000)
     raw = LibGSL.gsl_multiroot_fsolver_alloc(algorithm.to_unsafe)
@@ -93,5 +93,54 @@ module GSL::MultiRoot
     ensure
       LibGSL.gsl_multiroot_fsolver_free(raw)
     end
+  end
+
+  def self.find_root(initial : GSL::Vector, eps_x : Float64 = 1e-6, eps_f : Float64 = 1e-9, *,
+                     algorithm : GSL::Roots::AlgorithmF = GSL::MultiRoot::AlgorithmF::HybridScaled,
+                     max_iter = 10000, &f : GSL::MultiRootFunction)
+    find_root(f, initial, eps_x, eps_f, algorithm, max_iter)
+  end
+
+  # High-level interface to root finder.
+  #
+  # - `f` - function to minimize
+  # - `initial` - initial guess
+  # - `eps_x` - tolerance by x. Iterations terminates when all components of dx are <= eps_x
+  # - `eps_f` - tolerance by f. Iterations terminates when all components of f are <= eps_x
+  # - `algorithm` - root finding algorithm to be used
+  # - `max_iter` - maximum number of iterations
+  #
+  # returns `{result, x_root}`
+  #  - `result` (type `GSL::Result`) represents result of minimization
+  #  - `x_root` - value of root on last iteration
+  def self.find_root(f : GSL::MultiRootFunctionFDF, initial : GSL::Vector, eps_x : Float64 = 1e-6, eps_f : Float64 = 1e-9, *,
+                     algorithm : GSL::Roots::AlgorithmFDF = GSL::MultiRoot::AlgorithmF::HybridJScaled,
+                     max_iter = 10000)
+    raw = LibGSL.gsl_multiroot_fdfsolver_alloc(algorithm.to_unsafe)
+    begin
+      function = GSL.wrap_function(f)
+      LibGSL.gsl_multiroot_fdfsolver_set(raw, pointerof(function), x_lower, x_upper)
+      max_iter.times do
+        unless LibGSL::Code.new(LibGSL.gsl_multiroot_fdfsolver_iterate(raw)).success?
+          return GSL::Result::NoConvergence, raw.value.x.value.unsafe_as(GSL::Vector)
+        end
+        dx = raw.value.dx.value.unsafe_as(GSL::Vector)
+        f_value = raw.value.f.value.unsafe_as(GSL::Vector)
+        dx_passed = dx.all? { |v| v <= eps_x }
+        f_passed = f_value.all? { |v| v <= eps_f }
+        if dx_passed || f_passed
+          return GSL::Result::Success, raw.value.x.value.unsafe_as(GSL::Vector)
+        end
+      end
+      return GSL::Result::IterationLimit, raw.value.x.value.unsafe_as(GSL::Vector)
+    ensure
+      LibGSL.gsl_multiroot_fdfsolver_free(raw)
+    end
+  end
+
+  def self.find_root(initial : GSL::Vector, eps_x : Float64 = 1e-6, eps_f : Float64 = 1e-9, *,
+                     algorithm : GSL::Roots::AlgorithmFDF = GSL::MultiRoot::AlgorithmF::HybridScaled,
+                     max_iter = 10000, &f : GSL::MultiRootFunctionFDF)
+    find_root(f, initial, eps_x, eps_f, algorithm, max_iter)
   end
 end
