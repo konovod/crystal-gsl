@@ -1,17 +1,6 @@
 require "./matrix.cr"
 
 module GSL
-  struct Vector
-    def each(&block : Float64 -> _)
-      self.to_slice.each &block
-      self
-    end
-
-    def map(&block : Float64 -> _)
-      self.to_a.map &block
-    end
-  end
-
   class Matrix
     def each_rows(&block : Vector -> _)
       (0...self.nrows).map { |x| self.row(x) }.each &block

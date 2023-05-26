@@ -137,7 +137,7 @@ describe GSL::Vector do
   end
   describe "#minmax" do
     it "should return a array for minimun value and maximum value of vector" do
-      length_four_vector.minmax.should eq [1.0, 4.0]
+      length_four_vector.minmax.should eq({1.0, 4.0})
     end
   end
   describe "#max_index" do

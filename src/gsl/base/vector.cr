@@ -1,10 +1,7 @@
 module GSL
   struct Vector
+    include Indexable::Mutable(Float64)
     getter raw : LibGSL::Gsl_vector
-
-    def size : Int32
-      @raw.size.to_i32
-    end
 
     def initialize(size : Int32)
       slice = Slice(Float64).new(size)
@@ -15,14 +12,6 @@ module GSL
         data: slice.to_unsafe,
         block: nil,
         owner: 0)
-    end
-
-    def to_unsafe
-      pointerof(@raw)
-    end
-
-    def inspect
-      "GSL::Vector: #{self.to_array}"
     end
 
     def initialize(a : Array(Float64))
@@ -39,16 +28,28 @@ module GSL
         owner: 0)
     end
 
+    def to_unsafe
+      pointerof(@raw)
+    end
+
+    def size : Int32
+      @raw.size.to_i32
+    end
+
+    def unsafe_put(index : Int, value : T)
+      @raw.data[index*@raw.stride] = value
+    end
+
+    def unsafe_fetch(index : Int)
+      @raw.data[index*@raw.stride]
+    end
+
+    def inspect
+      "GSL::Vector: #{self.to_array}"
+    end
+
     def ==(n : GSL::Vector) : Bool
       LibGSL.gsl_vector_equal(self.pointer, n.pointer) == 1 ? true : false
-    end
-
-    def [](i) : Float64
-      to_slice[i*@raw.stride]
-    end
-
-    def []=(i, x) : Float64
-      to_slice[i*@raw.stride] = x
     end
 
     def pointer
@@ -63,23 +64,9 @@ module GSL
       return "[#{(0...self.size).map { |i| self[i].to_s }.join(", ")}]"
     end
 
+    # alias to to_a
     def to_array : Array(Float64)
-      Array(Float64).new(size) { |i| self[i] }
-    end
-
-    # alias to to_array
-    def to_a : Array(Float64)
-      self.to_array
-    end
-
-    # This function checks if values are in vector or not
-    #
-    # ```
-    # data = [1,2,3].to_vector
-    # data.includes? 2 => true
-    # ```
-    def includes?(n : Float64 | Int32) : Bool
-      self.to_slice.includes? n.to_f
+      to_a
     end
 
     # Add element to the button of vector
@@ -151,14 +138,6 @@ module GSL
       self.size >= 5 ? ((self.size - 5...self.size).map { |x| self[x] }).to_vector : self
     end
 
-    def first : Float64
-      self[0]
-    end
-
-    def last : Float64
-      self[self.size - 1]
-    end
-
     # replace current vector with input vector
     # note that two vector should have the same length
     #
@@ -206,40 +185,6 @@ module GSL
     def reverse! : Vector
       LibGSL.gsl_vector_reverse(self.pointer)
       self
-    end
-
-    # return the maximum value of current vector
-    # note: if there are multiple same maximum value then only return once
-    #
-    # ```
-    # a = [1,2,3].to_vector
-    # a.max => 3.0
-    # ```
-    def max : Float64
-      LibGSL.gsl_vector_max(self.pointer)
-    end
-
-    # return the minimum value of current vector
-    # note: if there are multiple same minimum value then only return once
-    #
-    # ```
-    # a = [1,2,3].to_vector
-    # a.min => 1.0
-    # ```
-    def min : Float64
-      LibGSL.gsl_vector_min(self.pointer)
-    end
-
-    # return the minimum and maximun values of current vector
-    #
-    # ```
-    # a = [1,2,3].to_vector
-    # min, max = a.minmax
-    # min => 1.0
-    # max => 3.0
-    # ```
-    def minmax : Array(Float64)
-      [self.min, self.max]
     end
 
     # return the index of maximum value of current vector
