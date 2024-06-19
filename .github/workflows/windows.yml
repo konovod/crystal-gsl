@@ -18,14 +18,14 @@ jobs:
           path: |
             gsl/lib/x64/Debug/gsl.lib
             gsl/lib/x64/Debug/cblas.lib
-          key: static-x64-Debug-de1c175ee239ea0f243bf72016bad2e53338e830
+          key: static-x64-Debug-78fd965ff426117fa9a250365f6d4525fa7808e0
       - name: Checkout GSL
         if: steps.cache-gsl.outputs.cache-hit != 'true'
         uses: actions/checkout@v2
         with:
           repository: BrianGladman/gsl
           path: gsl
-          ref: de1c175ee239ea0f243bf72016bad2e53338e830 # master @ 2022-04-19
+          ref: 78fd965ff426117fa9a250365f6d4525fa7808e0 # master @ 2024-06-19
       - name: Add msbuild to PATH
         if: steps.cache-gsl.outputs.cache-hit != 'true'
         uses: microsoft/setup-msbuild@v1.1
