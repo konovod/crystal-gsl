@@ -26,16 +26,16 @@ module GSL
     end
 
     private macro def_function_with_args(fn, *args)
-      def {{fn}}({{*args}}) : Float64
-        code = LibGSL.gsl_sf_{{fn}}_e({{*args.map(&.var)}}, out result)
+      def {{fn}}({{args.splat}}) : Float64
+        code = LibGSL.gsl_sf_{{fn}}_e({{args.map(&.var).splat}}, out result)
         check_return_code(LibGSL::Code.new(code), "gsl_sf_{{fn}}_e")
         result.val
       end
     end
 
     private macro def_function_with_args_mode(fn, *args)
-      def {{fn}}({{*args}}, precision : Precision = Precision::Double) : Float64
-        code = LibGSL.gsl_sf_{{fn}}_e({{*args.map(&.var)}}, precision, out result)
+      def {{fn}}({{args.splat}}, precision : Precision = Precision::Double) : Float64
+        code = LibGSL.gsl_sf_{{fn}}_e({{args.map(&.var).splat}}, precision, out result)
         check_return_code(LibGSL::Code.new(code), "gsl_sf_{{fn}}_e")
         result.val
       end
@@ -50,9 +50,9 @@ module GSL
     end
 
     private macro def_function_array(fn, size, *args)
-      def {{fn}}({{*args}}) : Array(Float64)
+      def {{fn}}({{args.splat}}) : Array(Float64)
         results = Array(Float64).new({{size}}, 0.0)
-        code = LibGSL.gsl_sf_{{fn}}_array({{*args.map(&.var)}}, results)
+        code = LibGSL.gsl_sf_{{fn}}_array({{args.map(&.var).splat}}, results)
         check_return_code(LibGSL::Code.new(code), "gsl_sf_{{fn}}_e")
         results
       end

@@ -30,34 +30,34 @@ module Statistics
       {% end %} 
 
       def initialize({{
-                       *params.map do |field|
+                       params.map do |field|
                          "@#{field.id}".id
-                       end
+                       end.splat
                      }})
       end
 
 
       def pdf(x : {{continuous ? Float64 : Int}} ) : Float64
-        return LibGSL.gsl_ran_{{gsl_name.id}}_pdf(x, {{ *params.map(&.var) }})
+        return LibGSL.gsl_ran_{{gsl_name.id}}_pdf(x, {{ params.map(&.var).splat }})
       end
 
       def cdf(x : {{continuous ? Float64 : Int}} ) : Float64
-        return LibGSL.gsl_cdf_{{gsl_name.id}}_P(x, {{ *params.map(&.var) }})
+        return LibGSL.gsl_cdf_{{gsl_name.id}}_P(x, {{ params.map(&.var).splat }})
       end
 
       {% if params.size > 0 %}
         def sample(rng : Random? = nil) : {{continuous ? Float64 : Int}} 
-          return {{name.id}}.sample({{ *params.map(&.var) }}, rng)
+          return {{name.id}}.sample({{ params.map(&.var).splat }}, rng)
         end
 
-        def self.sample({{ *params }}, rng : Random? = nil) : {{continuous ? Float64 : Int}}
+        def self.sample({{ params.splat }}, rng : Random? = nil) : {{continuous ? Float64 : Int}}
           if rng
             rng_value = GSL.wrap_rng(rng)
             rng = pointerof(rng_value)
           else
             rng = GSL::RNG
           end
-          return LibGSL.gsl_ran_{{gsl_name.id}}(rng, {{ *params.map(&.var) }})
+          return LibGSL.gsl_ran_{{gsl_name.id}}(rng, {{ params.map(&.var).splat }})
         end
       {% else %}
         def sample(rng : Random? = nil) : {{continuous ? Float64 : Int}} 
@@ -80,7 +80,7 @@ module Statistics
   end
 
   private macro distribution(name, continuous, *params)
-  distribution_named({{name}}, {{continuous}}, {{name.stringify.underscore.id}}, {{*params}})
+  distribution_named({{name}}, {{continuous}}, {{name.stringify.underscore.id}}, {{params.splat}})
   end
 
   distribution(Cauchy, true, a : Float64)
