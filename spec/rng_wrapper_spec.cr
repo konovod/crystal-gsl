@@ -1,6 +1,6 @@
 describe GSL do
   it "should wrap Random to work with gsl functions" do
-    rng1 = GSL.wrap_rng(Random::DEFAULT)
+    rng1 = GSL.wrap_rng(Random.new)
     rng2 = GSL.wrap_rng(Random::Secure)
 
     String.new(LibGSL.gsl_rng_name(pointerof(rng1))).should eq "Crystal Random wrapper"

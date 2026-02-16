@@ -253,7 +253,7 @@ module Statistics
       if max < min
         raise ArgumentError.new("Maximum cannot be smaller than minimum")
       end
-      (rng || Random::DEFAULT).rand(min..max)
+      (rng || Random).rand(min..max)
     end
 
     # Returns an array of random integers from *min* to *max*

@@ -56,7 +56,7 @@ module GSL::Siman
   # - `params` defines algorithm parameters (see `GSL::Siman::Params`)
   # - if `print_status` is true, current state will be printed to `STDOUT` during search
   # - `random` sets random generator
-  def self.solve(initial : Configuration, params : Params, print_status = false, random : Random = Random::DEFAULT) : Configuration
+  def self.solve(initial : Configuration, params : Params, print_status = false, random : Random = Random.new) : Configuration
     n_evals = 1
     n_iter = 0
     e = initial.energy

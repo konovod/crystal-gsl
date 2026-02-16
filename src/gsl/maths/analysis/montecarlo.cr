@@ -1,5 +1,5 @@
 module GSL::MonteCarlo
-  def self.integrate_plain(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random::DEFAULT)
+  def self.integrate_plain(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random.new)
     raise ArgumentError.new("xl.size != xu.size (#{xl.size} != #{xu.size})") unless xl.size == xu.size
     dim = xl.size
     workspace = LibGSL.gsl_monte_plain_alloc(dim)
@@ -28,7 +28,7 @@ module GSL::MonteCarlo
     end
   end
 
-  def self.integrate_miser(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random::DEFAULT, params : MiserParams? = nil)
+  def self.integrate_miser(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random.new, params : MiserParams? = nil)
     raise ArgumentError.new("xl.size != xu.size (#{xl.size} != #{xu.size})") unless xl.size == xu.size
     dim = xl.size
     workspace = LibGSL.gsl_monte_miser_alloc(dim)
@@ -43,7 +43,7 @@ module GSL::MonteCarlo
     return result, err
   end
 
-  def self.integrate_miser(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random::DEFAULT,
+  def self.integrate_miser(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random.new,
                            **args)
     integrate_miser(function, xl, xu, calls, random, MiserParams.new(**args))
   end
@@ -86,7 +86,7 @@ module GSL::MonteCarlo
       @function : Pointer(LibGSL::Gsl_monte_function),
       @xl : Slice(Float64),
       @xu : Slice(Float64),
-      @rng : Pointer(LibGSL::Gsl_rng)
+      @rng : Pointer(LibGSL::Gsl_rng),
     )
       @result = Float64::NAN
       @err_estimate = Float64::NAN
@@ -117,7 +117,7 @@ module GSL::MonteCarlo
     end
   end
 
-  def self.integrate_vegas(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random::DEFAULT, params : VegasParams? = nil)
+  def self.integrate_vegas(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random.new, params : VegasParams? = nil)
     raise ArgumentError.new("xl.size != xu.size (#{xl.size} != #{xu.size})") unless xl.size == xu.size
     dim = xl.size
     workspace = LibGSL.gsl_monte_vegas_alloc(dim)
@@ -132,7 +132,7 @@ module GSL::MonteCarlo
     return result, err
   end
 
-  def self.integrate_vegas(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random::DEFAULT, *,
+  def self.integrate_vegas(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random.new, *,
                            alpha : Float64 = 1.5,
                            iterations : Int32 = 5,
                            stage : VegasStage = VegasStage::NewRun,
@@ -140,7 +140,7 @@ module GSL::MonteCarlo
     integrate_vegas(function, xl, xu, calls, random, VegasParams.new(alpha, iterations, stage, sampling))
   end
 
-  def self.integrate_vegas(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), random = Random::DEFAULT, params : VegasParams? = nil, &)
+  def self.integrate_vegas(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), random = Random.new, params : VegasParams? = nil, &)
     raise ArgumentError.new("xl.size != xu.size (#{xl.size} != #{xu.size})") unless xl.size == xu.size
     dim = xl.size
     workspace = LibGSL.gsl_monte_vegas_alloc(dim)
@@ -166,7 +166,7 @@ module GSL::MonteCarlo
     return int.result, int.err_estimate
   end
 
-  def self.integrate_vegas(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), random = Random::DEFAULT, *,
+  def self.integrate_vegas(function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), random = Random.new, *,
                            alpha : Float64 = 1.5,
                            iterations : Int32 = 5,
                            stage : VegasStage = VegasStage::NewRun,
@@ -182,7 +182,7 @@ module GSL::MonteCarlo
     Vegas
   end
 
-  def self.integrate(algorithm : Algorithm, function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random::DEFAULT)
+  def self.integrate(algorithm : Algorithm, function : Proc(Slice(Float64), Float64), xl : Slice(Float64), xu : Slice(Float64), calls : Int32, random = Random.new)
     case algorithm
     in .plain?
       integrate_plain(function, xl, xu, calls, random)

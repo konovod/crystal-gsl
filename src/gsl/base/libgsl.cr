@@ -7285,7 +7285,7 @@ end
 
 module GSL
   # looks like it makes spec pass 2x slower
-  # private RNG_VALUE = GSL.wrap_rng(Random::DEFAULT)
+  # private RNG_VALUE = GSL.wrap_rng(Random.new)
   # RNG       = pointerof(RNG_VALUE)
 
   RNG = LibGSL.gsl_rng_alloc(LibGSL.gsl_rng_env_setup)
