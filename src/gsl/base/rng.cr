@@ -4,7 +4,7 @@ module GSL
     max: UInt64::MAX,
     min: 0,
     size: sizeof(LibC::SizeT),
-    set: ->(ptr : Void*, seed : LibC::ULong) {},
+    set: ->(ptr : Void*, seed : LibC::ULong) { },
     get: ->(ptr : Void*) { ptr.as(Box(Random)).object.rand(LibC::ULong::MIN..LibC::ULong::MAX) },
     get_double: ->(ptr : Void*) { ptr.as(Box(Random)).object.next_float }
   )
