@@ -14,8 +14,10 @@ jobs:
         uses: actions/cache@v5
         with:
           path: |
-            gsl/lib/x64/Debug/gsl.lib
-            gsl/lib/x64/Debug/cblas.lib
+            gsl/dll/x64/Debug/gsl.dll
+            gsl/dll/x64/Debug/gsl.lib
+            gsl/dll/x64/Debug/cblas.dll
+            gsl/dll/x64/Debug/cblas.lib
           key: static-x64-Debug-3028a773fea1f9fd2c652a847148e64053111bab
       - name: Checkout GSL
         if: steps.cache-gsl.outputs.cache-hit != 'true'
@@ -23,7 +25,7 @@ jobs:
         with:
           repository: BrianGladman/gsl
           path: gsl
-          ref: 3028a773fea1f9fd2c652a847148e64053111bab # vs_build @ 2024-06-19
+          ref: 64680e33f07d88120172ac4cbc73023fdcfe9583 # vs_build @ 2025-12-13
       - name: Add msbuild to PATH
         if: steps.cache-gsl.outputs.cache-hit != 'true'
         uses: microsoft/setup-msbuild@v1.1
@@ -33,9 +35,12 @@ jobs:
           cd gsl
           cd build.vc
           msbuild gslhdrs/gslhdrs.vcxproj /p:Configuration=Debug /p:Platform=x64
-          msbuild gsl.lib.sln /p:Configuration=Debug /p:Platform=x64
+          msbuild gsl.dll.sln /p:Configuration=Debug /p:Platform=x64
       - name: copy GSL libraries
         run: |
-          echo "LIB=$(pwd)\gsl/lib/x64/Debug;${env:LIB}" >>${env:GITHUB_ENV}
+          echo "LIB=$(pwd)\gsl/dll/x64/Debug;${env:LIB}" >>${env:GITHUB_ENV}
+          cd gsl/dll/x64/Debug
+          copy cblas.dll ../../../..
+          copy gsl.dll ../../../..
       - run: shards install
       - run: crystal spec
