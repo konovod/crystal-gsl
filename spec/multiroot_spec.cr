@@ -8,7 +8,6 @@ describe GSL do
       result, root_value = GSL::MultiRoot.find_root(initial: GSL::Vector.new([-10.0, -5.0]), eps_f: 1e-7, max_iter: 1000) do |x, y|
         y[0] = a * (1 - x[0])
         y[1] = b * (x[1] - x[0] * x[0])
-        pp! x, y
       end
       result.should eq GSL::Result::Success
       root_value.should eq GSL::Vector.new([1.0, 1.0])
