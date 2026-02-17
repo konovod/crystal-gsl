@@ -109,19 +109,19 @@ module GSL::MultiRoot
     begin
       function = GSL.wrap_function(f, n)
       LibGSL.gsl_multiroot_fsolver_set(raw, pointerof(function), initial)
-      max_iter.times do
+      max_iter.times do |i|
         unless LibGSL::Code.new(LibGSL.gsl_multiroot_fsolver_iterate(raw)).gsl_success?
-          return GSL::Result::NoConvergence, raw.value.x.value.unsafe_as(GSL::Vector)
+          return GSL::Result::NoConvergence, GSL::Vector.new(raw.value.x)
         end
-        dx = raw.value.dx.value.unsafe_as(GSL::Vector)
-        f_value = raw.value.f.value.unsafe_as(GSL::Vector)
+        dx = GSL::Vector.new(raw.value.dx)
+        f_value = GSL::Vector.new(raw.value.f)
         dx_passed = dx.all? { |v| v.abs <= eps_x }
         f_passed = f_value.all? { |v| v.abs <= eps_f }
         if dx_passed || f_passed
-          return GSL::Result::Success, raw.value.x.value.unsafe_as(GSL::Vector)
+          return GSL::Result::Success, GSL::Vector.new(raw.value.x)
         end
       end
-      return GSL::Result::IterationLimit, raw.value.x.value.unsafe_as(GSL::Vector)
+      return GSL::Result::IterationLimit, GSL::Vector.new(raw.value.x)
     ensure
       LibGSL.gsl_multiroot_fsolver_free(raw)
     end
@@ -155,17 +155,17 @@ module GSL::MultiRoot
       LibGSL.gsl_multiroot_fdfsolver_set(raw, pointerof(function), initial)
       max_iter.times do
         unless LibGSL::Code.new(LibGSL.gsl_multiroot_fdfsolver_iterate(raw)).gsl_success?
-          return GSL::Result::NoConvergence, raw.value.x.value.unsafe_as(GSL::Vector)
+          return GSL::Result::NoConvergence, GSL::Vector.new(raw.value.x)
         end
-        dx = raw.value.dx.value.unsafe_as(GSL::Vector)
-        f_value = raw.value.f.value.unsafe_as(GSL::Vector)
+        dx = GSL::Vector.new(raw.value.dx)
+        f_value = GSL::Vector.new(raw.value.f)
         dx_passed = dx.all? { |v| v.abs <= eps_x }
         f_passed = f_value.all? { |v| v.abs <= eps_f }
         if dx_passed || f_passed
-          return GSL::Result::Success, raw.value.x.value.unsafe_as(GSL::Vector)
+          return GSL::Result::Success, GSL::Vector.new(raw.value.x)
         end
       end
-      return GSL::Result::IterationLimit, raw.value.x.value.unsafe_as(GSL::Vector)
+      return GSL::Result::IterationLimit, GSL::Vector.new(raw.value.x)
     ensure
       LibGSL.gsl_multiroot_fdfsolver_free(raw)
     end
