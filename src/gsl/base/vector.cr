@@ -28,6 +28,14 @@ module GSL
         owner: 0)
     end
 
+    def self.new(from_gsl_ptr : LibGSL::Gsl_vector*)
+      return from_gsl_ptr.value.unsafe_as(Vector)
+    end
+
+    def self.new(from_gsl : LibGSL::Gsl_vector)
+      return from_gsl.unsafe_as(Vector)
+    end
+
     def to_unsafe
       pointerof(@raw)
     end

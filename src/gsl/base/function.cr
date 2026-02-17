@@ -124,20 +124,22 @@ module GSL
   alias MultiRootFunctionFDF = (Vector, Vector?, DenseMatrix? -> Void)
 
   # wraps user supplied function (can be closured) to the `LibGSL::Gsl_multiroot_function` structure. Used internally in high-level wrappers.
-  def self.wrap_function(function : MultiRootFunction)
+  def self.wrap_function(function : MultiRootFunction, dim)
     result = uninitialized LibGSL::Gsl_multiroot_function
     if function.closure?
       box = Box.box(function)
       # (LibGSL::Gsl_vector*, Void*, LibGSL::Gsl_vector* -> Int)
       result.f = ->(x : LibGSL::Gsl_vector*, data : Void*, f : LibGSL::Gsl_vector*) do
-        Box(MultiRootFunction).unbox(data).call(x.unsafe_as(Vector), f.unsafe_as(Vector))
+        Box(MultiRootFunction).unbox(data).call(Vector.new(x), Vector.new(f))
         LibGSL::Code::GSL_SUCCESS
       end
       result.params = box # no need to keep reference to `box` as `result` holds it.
+      result.n = dim
     else
       result.params = function.pointer
+      result.n = dim
       result.f = ->(x : LibGSL::Gsl_vector*, data : Void*, f : LibGSL::Gsl_vector*) do
-        MultiRootFunction.new(data, Pointer(Void).null).call(x.unsafe_as(Vector), f.unsafe_as(Vector))
+        MultiRootFunction.new(data, Pointer(Void).null).call(Vector.new(x), Vector.new(f))
         LibGSL::Code::GSL_SUCCESS
       end
     end
@@ -145,49 +147,53 @@ module GSL
   end
 
   # wraps user supplied function (can be closured) to the `LibGSL::Gsl_multiroot_function` structure. Used internally in high-level wrappers.
-  def self.wrap_function(&function : MultiRootFunction)
-    wrap_function(function)
+  def self.wrap_function(dim, &function : MultiRootFunction)
+    wrap_function(function, dim)
   end
 
   class DenseMatrix
     # :nodoc:
     def initialize(*, hack_null : Bool)
-      @pointer = Pointer(Gsl_matrix).null
+      @pointer = Pointer(LibGSL::Gsl_matrix).null
     end
 
     # :nodoc:
-    def hack_set_ptr(ptr)
-      @pointer = Pointer(Gsl_matrix)
+    def hack_set_ptr(ptr : Pointer(LibGSL::Gsl_matrix))
+      @pointer = ptr
     end
   end
 
   # wraps user supplied function (can be closured) to the `LibGSL::Gsl_multiroot_function_fdf` structure. Used internally in high-level wrappers.
-  def self.wrap_function(function : MultiRootFunctionFDF)
+  def self.wrap_function(function : MultiRootFunctionFDF, dim)
     result = uninitialized LibGSL::Gsl_multiroot_function_fdf
 
     box = Box.box({function, DenseMatrix.new(hack_null: true)})
     result.f = ->(x : LibGSL::Gsl_vector*, data : Void*, f : LibGSL::Gsl_vector*) do
-      function, _ = Box(Tuple(MultiRootFunctionFDF, DenseMatrix)).unbox(data)
-      function.call(x.unsafe_as(Vector), f.unsafe_as(Vector), nil)
+      func, _ = Box(Tuple(MultiRootFunctionFDF, DenseMatrix)).unbox(data)
+      func.call(Vector.new(x), Vector.new(f), nil)
       LibGSL::Code::GSL_SUCCESS
     end
+    result.n = dim
     result.df = ->(x : LibGSL::Gsl_vector*, data : Void*, m : LibGSL::Gsl_matrix*) do
-      function, matrix = Box(Tuple(MultiRootFunctionFDF, DenseMatrix)).unbox(data)
+      func, matrix = Box(Tuple(MultiRootFunctionFDF, DenseMatrix)).unbox(data)
       matrix.hack_set_ptr m
-      function.call(x.unsafe_as(Vector), nil, matrix)
+      func.call(Vector.new(x), nil, matrix)
+      matrix.hack_set_ptr Pointer(LibGSL::Gsl_matrix).null
       LibGSL::Code::GSL_SUCCESS
     end
     result.fdf = ->(x : LibGSL::Gsl_vector*, data : Void*, f : LibGSL::Gsl_vector*, m : LibGSL::Gsl_matrix*) do
-      function, matrix = Box(Tuple(MultiRootFunctionFDF, DenseMatrix)).unbox(data)
+      func, matrix = Box(Tuple(MultiRootFunctionFDF, DenseMatrix)).unbox(data)
       matrix.hack_set_ptr m
-      function.call(x.unsafe_as(Vector), f.unsafe_as(Vector), matrix)
+      func.call(Vector.new(x), Vector.new(f), matrix)
+      matrix.hack_set_ptr Pointer(LibGSL::Gsl_matrix).null
+      LibGSL::Code::GSL_SUCCESS
     end
     result.params = box # no need to keep reference to `box` as `result` holds it.
     result
   end
 
   # wraps user supplied function (can be closured) to the `LibGSL::Gsl_multiroot_function_fdf` structure. Used internally in high-level wrappers.
-  def self.wrap_function(&function : MultiRootFunctionFDF)
-    wrap_function(function)
+  def self.wrap_function(dim, &function : MultiRootFunctionFDF)
+    wrap_function(function, dim)
   end
 end

@@ -37,7 +37,7 @@ Status of GSL areas (list taken from [GSL docs](https://www.gnu.org/software/gsl
 | Discrete Hankel Transforms | - | - | I dont' understand what is it |
 | One Dimensional Root-Finding | Done | Done |  |
 | One Dimensional Minimization | Done | Done |  |
-| Multidimensional Root-Finding | - | - |  |
+| Multidimensional Root-Finding | Done | - |  |
 | Multidimensional Minimization | - | - | See https://github.com/konovod/nlopt for NLOpt bindings. But GSL would be nice to have too |
 | Linear Least-Squares Fitting | Partially done | - | Only 1-D Linear regression at this moment |
 | Nonlinear Least-Squares Fitting | - | - |  |

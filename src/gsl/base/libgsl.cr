@@ -5029,7 +5029,7 @@ lib LibGSL
   fun gsl_multimin_fdfminimizer_minimum(s : Gsl_multimin_fdfminimizer*) : LibC::Double
 
   struct Gsl_multiroot_function
-    f : (Gsl_vector*, Void*, Gsl_vector* -> LibC::Int)
+    f : (Gsl_vector*, Void*, Gsl_vector* -> LibGSL::Code)
     n : LibC::SizeT
     params : Void*
   end
@@ -5065,9 +5065,9 @@ lib LibGSL
   fun gsl_multiroot_fsolver_f(s : Gsl_multiroot_fsolver*) : Gsl_vector*
 
   struct Gsl_multiroot_function_fdf
-    f : (Gsl_vector*, Void*, Gsl_vector* -> LibC::Int)
-    df : (Gsl_vector*, Void*, Gsl_matrix* -> LibC::Int)
-    fdf : (Gsl_vector*, Void*, Gsl_vector*, Gsl_matrix* -> LibC::Int)
+    f : (Gsl_vector*, Void*, Gsl_vector* -> LibGSL::Code)
+    df : (Gsl_vector*, Void*, Gsl_matrix* -> LibGSL::Code)
+    fdf : (Gsl_vector*, Void*, Gsl_vector*, Gsl_matrix* -> LibGSL::Code)
     n : LibC::SizeT
     params : Void*
   end
