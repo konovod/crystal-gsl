@@ -28,7 +28,7 @@ Status of GSL areas (list taken from [GSL docs](https://www.gnu.org/software/gsl
 | N-tuples | - | - | Not a priority for me (PR welcome though) |
 | Monte Carlo Integration | Done | - |  |
 | Simulated Annealing | Done | Done |  |
-| Ordinary Differential Equations | Done | - |  |
+| Ordinary Differential Equations | Done | Done |  |
 | Interpolation | Done | - |  |
 | Numerical Differentiation | Done | Done |  |
 | Chebyshev Approximations | Done | - |  |
