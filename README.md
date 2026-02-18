@@ -3,7 +3,7 @@
 [![Linux CI](https://github.com/konovod/crystal-gsl/actions/workflows/linux.yml/badge.svg)](https://github.com/konovod/crystal-gsl/actions/workflows/linux.yml)
 [![MacOS CI](https://github.com/konovod/crystal-gsl/actions/workflows/macos.yml/badge.svg)](https://github.com/konovod/crystal-gsl/actions/workflows/macos.yml)
 [![Windows CI](https://github.com/konovod/crystal-gsl/actions/workflows/windows.yml/badge.svg)](https://github.com/konovod/crystal-gsl/actions/workflows/windows.yml)
-[![API Documentation](https://img.shields.io/website?down_color=red&down_message=Offline&label=API%20Documentation&up_message=Online&url=https%3A%2F%2Fkonovod.github.io%2Fcrystal-gsl%2F)](https://konovod.github.io/crystal-gsl) 
+[![API Documentation](https://img.shields.io/website?down_color=red&down_message=Offline&label=API%20Documentation&up_message=Online&url=https%3A%2F%2Fkonovod.github.io%2Fcrystal-gsl%2F)](https://konovod.github.io/crystal-gsl)
 
 GNU Scientific Library (GSL) binding for Crystal
 
@@ -37,7 +37,8 @@ Run `shards install`
 
 ### Windows
 
- - Recommended on [GSL website](https://www.gnu.org/software/gsl/extras/native_win_builds.html) way to get GSL on Windows is to build manually using .sln files from https://github.com/BrianGladman/gsl
+- Recommended on [GSL website](https://www.gnu.org/software/gsl/extras/native_win_builds.html) way to get GSL on Windows is to build manually using .sln files from https://github.com/BrianGladman/gsl
+
 ## Usage
 
 ```crystal
@@ -67,6 +68,7 @@ If you know GSL, you can call all GSL functions directly: `LibGSL.gsl_some_funct
 For a high-level wrappers, see [TODO.md](https://github.com/konovod/crystal-gsl/blob/master/TODO.md) for detailed list on what is done\missing.
 
 Below is a categorized list of what is done (with links to docs):
+
 - General
   - [Vectors](https://konovod.github.io/crystal-gsl/GSL/Vector.html)
   - [Matrices](https://konovod.github.io/crystal-gsl/GSL/Matrix.html)
@@ -88,6 +90,8 @@ Below is a categorized list of what is done (with links to docs):
   - [Scalar functions root finding](https://konovod.github.io/crystal-gsl/GSL/Roots.html)
   - [Simulated Annealing](https://konovod.github.io/crystal-gsl/GSL/Siman.html)
   - [Linear Regression](https://konovod.github.io/crystal-gsl/GSL/LinearRegression.html)
+  - Multidimensional Minimization
+  - Multidimensional Root-Finding
 - Approximation
   - [Chebyshev approximation](https://konovod.github.io/crystal-gsl/GSL/Chebyshev.html)
   - [B Splines](https://konovod.github.io/crystal-gsl/GSL/BSpline.html) (2.7 API)

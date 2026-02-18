@@ -81,7 +81,7 @@ module GSL::MultiMin
         LibGSL.gsl_multimin_fdfminimizer_conjugate_pr
       in .bfgs?
         LibGSL.gsl_multimin_fdfminimizer_vector_bfgs
-      in .bfgs?
+      in .bfgs2?
         LibGSL.gsl_multimin_fdfminimizer_vector_bfgs2
       in .steepest_descent?
         LibGSL.gsl_multimin_fdfminimizer_steepest_descent
@@ -99,7 +99,6 @@ module GSL::MultiMin
   # - `initial` - initial guess
   # - `initial_step` - initial step
   # - `eps_abs` - tolerance by x. Iterations terminates when characteristic size of algorithm is <= eps_abs
-  # - `eps_f` - tolerance by f. Iterations terminates df is <= eps_f
   # - `algorithm` - root finding algorithm to be used
   # - `max_iter` - maximum number of iterations
   #
@@ -126,7 +125,6 @@ module GSL::MultiMin
         unless LibGSL::Code.new(LibGSL.gsl_multimin_fminimizer_iterate(raw)).gsl_success?
           return GSL::Result::NoConvergence, GSL::Vector.new(LibGSL.gsl_multimin_fminimizer_x(raw)).clone, LibGSL.gsl_multimin_fminimizer_minimum(raw)
         end
-        # pp! oldx, oldf, newx, newf, dx_passed, f_passed
         if LibGSL.gsl_multimin_fminimizer_size(raw).abs <= eps_abs
           return GSL::Result::Success, GSL::Vector.new(LibGSL.gsl_multimin_fminimizer_x(raw)).clone, LibGSL.gsl_multimin_fminimizer_minimum(raw)
         end
@@ -141,5 +139,46 @@ module GSL::MultiMin
                     algorithm : GSL::MultiMin::AlgorithmF = GSL::MultiMin::AlgorithmF::NMSimplex2,
                     max_iter = 10000, &f : GSL::MultiMinFunction)
     find_min(f, initial, initial_step, eps_abs, algorithm: algorithm, max_iter: max_iter)
+  end
+
+  # High-level interface to minimizer.
+  #
+  # - `f` - function to minimize
+  # - `initial` - initial guess
+  # - `initial_step` - initial step
+  # - `eps_abs` - tolerance by x. Iterations terminates when norm of gradient is <= eps_abs
+  # - `algorithm` - root finding algorithm to be used
+  # - `max_iter` - maximum number of iterations
+  # - `line_tol` - the accuracy of the line minimization (internal parameter)
+  # returns `{result, x_min, f_min}`
+  #  - `result` (type `GSL::Result`) represents result of minimization
+  #  - `x_min` - value of x on last iteration
+  #  - `f_min` - value of f on last iteration
+  def self.find_min_fdf(f : GSL::MultiMinFunctionFDF, initial : GSL::Vector, initial_step : Float64 = 0.01, eps_abs : Float64 = 1e-6, *,
+                        line_tol = 0.1, algorithm : GSL::MultiMin::AlgorithmFDF = GSL::MultiMin::AlgorithmFDF::BFGS2,
+                        max_iter = 10000)
+    n = initial.size
+    raw = LibGSL.gsl_multimin_fdfminimizer_alloc(algorithm.to_unsafe, n)
+    begin
+      function = GSL.wrap_function(f, n)
+      LibGSL.gsl_multimin_fdfminimizer_set(raw, pointerof(function), initial, initial_step, line_tol)
+      max_iter.times do |i|
+        unless LibGSL::Code.new(LibGSL.gsl_multimin_fdfminimizer_iterate(raw)).gsl_success?
+          return GSL::Result::NoConvergence, GSL::Vector.new(LibGSL.gsl_multimin_fdfminimizer_x(raw)).clone, LibGSL.gsl_multimin_fdfminimizer_minimum(raw)
+        end
+        if LibGSL::Code.new(LibGSL.gsl_multimin_test_gradient(LibGSL.gsl_multimin_fdfminimizer_gradient(raw), eps_abs)).gsl_success?
+          return GSL::Result::Success, GSL::Vector.new(LibGSL.gsl_multimin_fdfminimizer_x(raw)).clone, LibGSL.gsl_multimin_fdfminimizer_minimum(raw)
+        end
+      end
+      return GSL::Result::IterationLimit, GSL::Vector.new(LibGSL.gsl_multimin_fdfminimizer_x(raw)).clone, LibGSL.gsl_multimin_fdfminimizer_minimum(raw)
+    ensure
+      LibGSL.gsl_multimin_fdfminimizer_free(raw)
+    end
+  end
+
+  def self.find_min_fdf(initial : GSL::Vector, initial_step : GSL::Vector | Float64 = 1.0, eps_abs : Float64 = 1e-6, *,
+                        algorithm : GSL::MultiMin::AlgorithmFDF = GSL::MultiMin::AlgorithmFDF::BFGS2,
+                        max_iter = 10000, &f : GSL::MultiMinFunctionFDF)
+    find_min_fdf(f, initial, initial_step, eps_abs, algorithm: algorithm, max_iter: max_iter)
   end
 end

@@ -38,7 +38,7 @@ Status of GSL areas (list taken from [GSL docs](https://www.gnu.org/software/gsl
 | One Dimensional Root-Finding | Done | Done |  |
 | One Dimensional Minimization | Done | Done |  |
 | Multidimensional Root-Finding | Done | - |  |
-| Multidimensional Minimization | - | - | See https://github.com/konovod/nlopt for NLOpt bindings. But GSL would be nice to have too |
+| Multidimensional Minimization | Done | - | See https://github.com/konovod/nlopt for NLOpt bindings that is more performant |
 | Linear Least-Squares Fitting | Partially done | - | Only 1-D Linear regression at this moment |
 | Nonlinear Least-Squares Fitting | - | - |  |
 | Basis Splines | Partially Done | - | 2.7 API done, but they were significantly overhauled in 2.8 |

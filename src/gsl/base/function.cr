@@ -231,34 +231,36 @@ module GSL
     result = uninitialized LibGSL::Gsl_multimin_function_fdf
     if function.closure?
       box = Box.box(function)
+      result.n = dim
       # alias MultiMinFunctionFDF = (Vector, Pointer(Float64)?, Vector? -> Void)
       # f : (Gsl_vector*, Void* -> LibC::Double)
-      result.f = ->(x : Gsl_vector*, data : Void*) do
+      result.f = ->(x : LibGSL::Gsl_vector*, data : Void*) do
         ret = 0.0
-        Box(MultiMinFunctionFDF).unbox(data).call(x, pointerof(ret), nil)
+        Box(MultiMinFunctionFDF).unbox(data).call(Vector.new(x), pointerof(ret), nil)
         ret
       end
       # df : (Gsl_vector*, Void*, Gsl_vector* -> Void)
-      result.df = ->(x : Gsl_vector*, data : Void*, g : Gsl_vector*) do
-        Box(MultiMinFunctionFDF).unbox(data).call(x, nil, Vector.new(g))
+      result.df = ->(x : LibGSL::Gsl_vector*, data : Void*, g : LibGSL::Gsl_vector*) do
+        Box(MultiMinFunctionFDF).unbox(data).call(Vector.new(x), nil, Vector.new(g))
       end
       # fdf : (Gsl_vector*, Void*, LibC::Double*, Gsl_vector* -> Void)
-      result.fdf = ->(x : Gsl_vector*, data : Void*, f : Float64*, g : Gsl_vector*) do
-        Box(MultiMinFunctionFDF).unbox(data).call(x, f, Vector.new(g))
+      result.fdf = ->(x : LibGSL::Gsl_vector*, data : Void*, f : Float64*, g : LibGSL::Gsl_vector*) do
+        Box(MultiMinFunctionFDF).unbox(data).call(Vector.new(x), f, Vector.new(g))
       end
       result.params = box # no need to keep reference to `box` as `result` holds it.
     else
       result.params = function.pointer
-      result.f = ->(x : Gsl_vector*, data : Void*) do
+      result.n = dim
+      result.f = ->(x : LibGSL::Gsl_vector*, data : Void*) do
         ret = 0.0
-        MultiMinFunctionFDF.new(data, Pointer(Void).null).call(x, pointerof(ret), nil)
+        MultiMinFunctionFDF.new(data, Pointer(Void).null).call(Vector.new(x), pointerof(ret), nil)
         ret
       end
-      result.df = ->(x : Gsl_vector*, data : Void*, g : Gsl_vector*) do
-        MultiMinFunctionFDF.new(data, Pointer(Void).null).call(x, nil, Vector.new(g))
+      result.df = ->(x : LibGSL::Gsl_vector*, data : Void*, g : LibGSL::Gsl_vector*) do
+        MultiMinFunctionFDF.new(data, Pointer(Void).null).call(Vector.new(x), nil, Vector.new(g))
       end
-      result.fdf = ->(x : Gsl_vector*, data : Void*, f : Float64*, g : Gsl_vector*) do
-        MultiMinFunctionFDF.new(data, Pointer(Void).null).call(x, f, Vector.new(g))
+      result.fdf = ->(x : LibGSL::Gsl_vector*, data : Void*, f : Float64*, g : LibGSL::Gsl_vector*) do
+        MultiMinFunctionFDF.new(data, Pointer(Void).null).call(Vector.new(x), f, Vector.new(g))
       end
     end
     result
