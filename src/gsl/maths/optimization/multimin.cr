@@ -92,4 +92,54 @@ module GSL::MultiMin
       LibGSL.gsl_multimin_fdfminimizer_name(to_unsafe)
     end
   end
+
+  # High-level interface to minimizer.
+  #
+  # - `f` - function to minimize
+  # - `initial` - initial guess
+  # - `initial_step` - initial step
+  # - `eps_abs` - tolerance by x. Iterations terminates when characteristic size of algorithm is <= eps_abs
+  # - `eps_f` - tolerance by f. Iterations terminates df is <= eps_f
+  # - `algorithm` - root finding algorithm to be used
+  # - `max_iter` - maximum number of iterations
+  #
+  # returns `{result, x_min, f_min}`
+  #  - `result` (type `GSL::Result`) represents result of minimization
+  #  - `x_min` - value of x on last iteration
+  #  - `f_min` - value of f on last iteration
+  def self.find_min(f : GSL::MultiMinFunction, initial : GSL::Vector, initial_step : GSL::Vector | Float64 = 1.0, eps_abs : Float64 = 1e-6, *,
+                    algorithm : GSL::MultiMin::AlgorithmF = GSL::MultiMin::AlgorithmF::NMSimplex2,
+                    max_iter = 10000)
+    n = initial.size
+    if initial_step.is_a? Float64
+      v = initial_step
+      initial_step = Vector.new(n)
+      initial_step.to_slice.fill(v)
+    else
+      raise ArgumentError.new("initial_step.size differs from initial.size") if initial.size != initial_step.size
+    end
+    raw = LibGSL.gsl_multimin_fminimizer_alloc(algorithm.to_unsafe, n)
+    begin
+      function = GSL.wrap_function(f, n)
+      LibGSL.gsl_multimin_fminimizer_set(raw, pointerof(function), initial, initial_step)
+      max_iter.times do |i|
+        unless LibGSL::Code.new(LibGSL.gsl_multimin_fminimizer_iterate(raw)).gsl_success?
+          return GSL::Result::NoConvergence, GSL::Vector.new(LibGSL.gsl_multimin_fminimizer_x(raw)).clone, LibGSL.gsl_multimin_fminimizer_minimum(raw)
+        end
+        # pp! oldx, oldf, newx, newf, dx_passed, f_passed
+        if LibGSL.gsl_multimin_fminimizer_size(raw).abs <= eps_abs
+          return GSL::Result::Success, GSL::Vector.new(LibGSL.gsl_multimin_fminimizer_x(raw)).clone, LibGSL.gsl_multimin_fminimizer_minimum(raw)
+        end
+      end
+      return GSL::Result::IterationLimit, GSL::Vector.new(LibGSL.gsl_multimin_fminimizer_x(raw)).clone, LibGSL.gsl_multimin_fminimizer_minimum(raw)
+    ensure
+      LibGSL.gsl_multimin_fminimizer_free(raw)
+    end
+  end
+
+  def self.find_min(initial : GSL::Vector, initial_step : GSL::Vector | Float64 = 1.0, eps_abs : Float64 = 1e-6, *,
+                    algorithm : GSL::MultiMin::AlgorithmF = GSL::MultiMin::AlgorithmF::NMSimplex2,
+                    max_iter = 10000, &f : GSL::MultiMinFunction)
+    find_min(f, initial, initial_step, eps_abs, algorithm: algorithm, max_iter: max_iter)
+  end
 end
