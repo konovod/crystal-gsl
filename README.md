@@ -90,8 +90,8 @@ Below is a categorized list of what is done (with links to docs):
   - [Scalar functions root finding](https://konovod.github.io/crystal-gsl/GSL/Roots.html)
   - [Simulated Annealing](https://konovod.github.io/crystal-gsl/GSL/Siman.html)
   - [Linear Regression](https://konovod.github.io/crystal-gsl/GSL/LinearRegression.html)
-  - Multidimensional Minimization
-  - Multidimensional Root-Finding
+  - [Multidimensional Minimization](https://konovod.github.io/crystal-gsl/GSL/MultiMin.html)
+  - [Multidimensional Root-Finding](https://konovod.github.io/crystal-gsl/GSL/MultiRoot.html)
 - Approximation
   - [Chebyshev approximation](https://konovod.github.io/crystal-gsl/GSL/Chebyshev.html)
   - [B Splines](https://konovod.github.io/crystal-gsl/GSL/BSpline.html) (2.7 API)
