@@ -196,4 +196,76 @@ module GSL
   def self.wrap_function(dim, &function : MultiRootFunctionFDF)
     wrap_function(function, dim)
   end
+
+  alias MultiMinFunction = (Vector -> Float64)
+  alias MultiMinFunctionFDF = (Vector, Pointer(Float64)?, Vector? -> Void)
+
+  # wraps user supplied function (can be closured) to the `LibGSL::Gsl_multimin_function` structure. Used internally in high-level wrappers.
+  def self.wrap_function(function : MultiMinFunction, dim)
+    result = uninitialized LibGSL::Gsl_multimin_function
+    if function.closure?
+      box = Box.box(function)
+      # (Gsl_vector*, Void* -> LibC::Double)
+      result.f = ->(x : LibGSL::Gsl_vector*, data : Void*) do
+        Box(MultiMinFunction).unbox(data).call(Vector.new(x))
+      end
+      result.params = box # no need to keep reference to `box` as `result` holds it.
+      result.n = dim
+    else
+      result.params = function.pointer
+      result.n = dim
+      result.f = ->(x : LibGSL::Gsl_vector*, data : Void*) do
+        MultiMinFunction.new(data, Pointer(Void).null).call(Vector.new(x))
+      end
+    end
+    result
+  end
+
+  # wraps user supplied function (can be closured) to the `LibGSL::Gsl_multimin_function` structure. Used internally in high-level wrappers.
+  def self.wrap_function(dim, &function : MultiMinFunction)
+    wrap_function(function, dim)
+  end
+
+  # wraps user supplied function (can be closured) to the `LibGSL::Gsl_multimin_function_fdf` structure. Used internally in high-level wrappers.
+  def self.wrap_function(function : MultiMinFunctionFDF, dim)
+    result = uninitialized LibGSL::Gsl_multimin_function_fdf
+    if function.closure?
+      box = Box.box(function)
+      # alias MultiMinFunctionFDF = (Vector, Pointer(Float64)?, Vector? -> Void)
+      # f : (Gsl_vector*, Void* -> LibC::Double)
+      result.f = ->(x : Gsl_vector*, data : Void*) do
+        ret = 0.0
+        Box(MultiMinFunctionFDF).unbox(data).call(x, pointerof(ret), nil)
+        ret
+      end
+      # df : (Gsl_vector*, Void*, Gsl_vector* -> Void)
+      result.df = ->(x : Gsl_vector*, data : Void*, g : Gsl_vector*) do
+        Box(MultiMinFunctionFDF).unbox(data).call(x, nil, Vector.new(g))
+      end
+      # fdf : (Gsl_vector*, Void*, LibC::Double*, Gsl_vector* -> Void)
+      result.fdf = ->(x : Gsl_vector*, data : Void*, f : Float64*, g : Gsl_vector*) do
+        Box(MultiMinFunctionFDF).unbox(data).call(x, f, Vector.new(g))
+      end
+      result.params = box # no need to keep reference to `box` as `result` holds it.
+    else
+      result.params = function.pointer
+      result.f = ->(x : Gsl_vector*, data : Void*) do
+        ret = 0.0
+        MultiMinFunctionFDF.new(data, Pointer(Void).null).call(x, pointerof(ret), nil)
+        ret
+      end
+      result.df = ->(x : Gsl_vector*, data : Void*, g : Gsl_vector*) do
+        MultiMinFunctionFDF.new(data, Pointer(Void).null).call(x, nil, Vector.new(g))
+      end
+      result.fdf = ->(x : Gsl_vector*, data : Void*, f : Float64*, g : Gsl_vector*) do
+        MultiMinFunctionFDF.new(data, Pointer(Void).null).call(x, f, Vector.new(g))
+      end
+    end
+    result
+  end
+
+  # wraps user supplied function (can be closured) to the `LibGSL::Gsl_multiroot_function_fdf` structure. Used internally in high-level wrappers.
+  def self.wrap_function(dim, &function : MultiMinFunctionFDF)
+    wrap_function(function, dim)
+  end
 end
