@@ -113,17 +113,28 @@ module GSL::ODE
 
   # ODE integration algorithms supported by GSL.
   enum Algorithm
-    RK2     # Explicit 2nd-order Runge-Kutta
-    RK4     # Explicit 4th-order Runge-Kutta
-    RKF45   # Runge-Kutta-Fehlberg (4/5)
-    RKCK    # Runge-Kutta-Cash-Karp (4/5)
-    RK8PD   # Runge-Kutta Prince-Dormand (8/9)
-    RK1IMP  # Implicit Euler (1st order)
-    RK2IMP  # Implicit midpoint (2nd order)
-    RK4IMP  # Gauss-Legendre (4th order)
-    BSIMP   # Implicit Bulirsch-Stoer
-    MSADAMS # Adams-Moulton predictor-corrector
-    MSBDF   # Backward Differentiation Formula
+    # Explicit 2nd-order Runge-Kutta
+    RK2
+    # Explicit 4th-order Runge-Kutta
+    RK4
+    # Runge-Kutta-Fehlberg (4/5)
+    RKF45
+    # Runge-Kutta-Cash-Karp (4/5)
+    RKCK
+    # Runge-Kutta Prince-Dormand (8/9)
+    RK8PD
+    # Implicit Euler (1st order)
+    RK1IMP
+    # Implicit midpoint (2nd order)
+    RK2IMP
+    # Gauss-Legendre (4th order)
+    RK4IMP
+    # Implicit Bulirsch-Stoer
+    BSIMP
+    # Adams-Moulton predictor-corrector
+    MSADAMS
+    # Backward Differentiation Formula
+    MSBDF
 
     # Returns true if algorithm requires a Jacobian.
     def require_jacobian?
